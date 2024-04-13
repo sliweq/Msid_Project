@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "msid-project"
+version = "0.1.0"
+description = ""
+authors = ["Jakub Śliwka <kubapplll@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+isort = "^5.13.2"
+black = "^24.4.0"
+mypy = "^1.9.0"
+pylint = "^3.1.0"
+flake8 = "^7.0.0"
+taskipy = "^1.12.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.taskipy.tasks]
+formatting = "python -m black . && python -m isort ."
+flake8 = "flake8 /home/sliwek/Programowanie/sem4/msid_l/project"
