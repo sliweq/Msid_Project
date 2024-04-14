@@ -1,6 +1,6 @@
 import logging
 
-from data_processing.downloader import PoliceDataDownloader
+from data_processing.downloaders import PoliceDataDownloader
 from setup_logging import setup_logging
 
 logger = logging.getLogger()
