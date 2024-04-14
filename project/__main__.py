@@ -9,5 +9,5 @@ logger = logging.getLogger()
 if __name__ == "__main__":
     setup_logging()
     PoliceDataDownloader(
-        "https://policja.pl/pol/form/1,Informacja-dzienna.html?page=2"
-    ).download()
+        "https://policja.pl/pol/form/1,Informacja-dzienna.html?page=0"
+    ).download(2024)
