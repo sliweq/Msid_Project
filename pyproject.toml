@@ -13,6 +13,12 @@ mypy = "^1.9.0"
 pylint = "^3.1.0"
 flake8 = "^7.0.0"
 taskipy = "^1.12.2"
+pandas = "^2.2.2"
+requests = "^2.31.0"
+bs4 = "^0.0.2"
+lxml = "^5.2.1"
+logging = "^0.4.9.6"
+formatting = "^0.0.1"
 
 
 [build-system]
@@ -21,4 +27,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.taskipy.tasks]
 formatting = "python -m black . && python -m isort ."
-flake8 = "flake8 /home/sliwek/Programowanie/sem4/msid_l/project"
+flake8 = "poetry run python -m flake8 project && echo All is ok"
+pylint = "pylint project"
+mypy = "python -m mypy --namespace-packages project"
