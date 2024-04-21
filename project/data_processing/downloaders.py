@@ -61,7 +61,16 @@ class PoliceDataDownloader(Downloader):
         self.recived_data: list[pd.DataFrame] = []
         self.data: pd.DataFrame = None
 
-    def concat_data(self) -> None:
+    def get_data(self) -> pd.DataFrame:
+        """
+        Returns the downloaded data
+
+        Returns:
+            pd.DataFrame: The downloaded data
+        """
+        return self.data
+
+    def _concat_data(self) -> None:
         """
         Concatenates the received data into a single DataFrame
         """
@@ -91,7 +100,7 @@ class PoliceDataDownloader(Downloader):
             return
 
         if self._download_specific_pages(first_page, last_page):
-            self.concat_data()
+            self._concat_data()
             logger.info("Data downloaded successfully!")
         else:
             logger.error("Failed to download data!")
@@ -219,3 +228,52 @@ class PoliceDataDownloader(Downloader):
             return False
         self.recived_data.append(data.loc[: last_page[1]])
         return True
+
+
+class HolidaysDataDownloader(Downloader):
+    def __init__(
+        self, url: str = "https://www.timeanddate.com/holidays/poland/"
+    ) -> None:
+        super().__init__(url)
+        self.data: pd.DataFrame = None
+
+    def get_data(self) -> pd.DataFrame:
+        return self.data
+
+    def download(self, year: int = 2023) -> None:
+        if year > datetime.now().year:
+            raise ValueError("Year cannot be greater than current year!")
+        data = self._download_data(self.url + f"{year}")
+        if data is not None:
+            self.data = data.dropna()
+            self.remove_useless_data()
+            logger.info("Data downloaded successfully!")
+        else:
+            logger.error("Failed to download data!")
+
+    def _download_data(self, url: str) -> Optional[pd.DataFrame]:
+        sleep(0.7)
+        response = requests.get(url, timeout=5)  # Add timeout argument
+        if response.status_code == 200:
+            logger.debug("Successfully downloaded data")
+            soup = BeautifulSoup(response.text, "html.parser")
+            table = soup.find(
+                "table",
+                class_="table table--left table--inner-borders-rows table--full-width table--sticky table--holidaycountry",
+            )
+            if table:
+                return pd.read_html(StringIO(str(table)))[0]
+            return None
+        logging.error(
+            "Failed to download data, error code %s \nfrom url: %s",
+            response.status_code,
+            url,
+        )
+        return None
+
+    def remove_useless_data(self) -> None:
+        indices_to_drop = []
+        for number, row in enumerate(self.data.values):
+            if "National holiday" not in row:
+                indices_to_drop.append(self.data.index[number])
+        self.data = self.data.drop(indices_to_drop)
