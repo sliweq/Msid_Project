@@ -68,7 +68,7 @@ class PoliceDataDownloader(Downloader):
         Returns:
             pd.DataFrame: The downloaded data
         """
-        return self.data
+        return self.data.sort_values(by="Data").reset_index(drop=True)
 
     def _concat_data(self) -> None:
         """
@@ -147,7 +147,7 @@ class PoliceDataDownloader(Downloader):
         last_year = datetime.strptime(data.loc[len(data) - 1, "Data"], "%Y-%m-%d").year
         page_iterator = 0
 
-        while first_year > accidents_year or last_year > accidents_year:
+        while first_year > accidents_year and last_year > accidents_year:
             page_iterator += 1
             data = self._download_data(url + f"{page_iterator}")
             if data is None or len(data) == 0:
@@ -182,7 +182,7 @@ class PoliceDataDownloader(Downloader):
         last_year = datetime.strptime(data.loc[len(data) - 1, "Data"], "%Y-%m-%d").year
         page_iterator = first_page
 
-        while first_year >= accidents_year and last_year >= accidents_year:
+        while first_year >= accidents_year or last_year >= accidents_year:
             page_iterator += 1
             data = self._download_data(url + f"{page_iterator}")
             if data is None or len(data) == 0:
@@ -231,16 +231,49 @@ class PoliceDataDownloader(Downloader):
 
 
 class HolidaysDataDownloader(Downloader):
+    """
+    A class for downloading holidays data from a specific URL.
+
+    Attributes:
+        url (str): The URL from which to download the data.
+        data (pd.DataFrame): The downloaded data as a pandas DataFrame.
+        year (Optional[int]): The year for which the data is downloaded.
+
+    Methods:
+        get_data(): Returns the downloaded data.
+        get_year(): Returns the year for which the data is downloaded.
+        download(year: int = 2023): Downloads the data for the specified year.
+        _download_data(url: str): Downloads the data from the specified URL.
+        remove_useless_data(): Removes useless data from the downloaded data.
+    """
+
     def __init__(
         self, url: str = "https://www.timeanddate.com/holidays/poland/"
     ) -> None:
         super().__init__(url)
         self.data: pd.DataFrame = None
+        self.year: Optional[int] = None
 
     def get_data(self) -> pd.DataFrame:
         return self.data
 
+    def get_year(self) -> Optional[int]:
+        return self.year
+
     def download(self, year: int = 2023) -> None:
+        """
+        Downloads the holidays data for the specified year.
+
+        Args:
+            year (int): The year for which to download the data. Defaults to 2023.
+
+        Raises:
+            ValueError: If the specified year is greater than the current year.
+
+        Returns:
+            None
+        """
+        self.year = year
         if year > datetime.now().year:
             raise ValueError("Year cannot be greater than current year!")
         data = self._download_data(self.url + f"{year}")
@@ -252,6 +285,15 @@ class HolidaysDataDownloader(Downloader):
             logger.error("Failed to download data!")
 
     def _download_data(self, url: str) -> Optional[pd.DataFrame]:
+        """
+        Downloads the data from the specified URL.
+
+        Args:
+            url (str): The URL from which to download the data.
+
+        Returns:
+            Optional[pd.DataFrame]: The downloaded data as a pandas DataFrame, or None if the download failed.
+        """
         sleep(0.7)
         response = requests.get(url, timeout=5)  # Add timeout argument
         if response.status_code == 200:
@@ -272,6 +314,12 @@ class HolidaysDataDownloader(Downloader):
         return None
 
     def remove_useless_data(self) -> None:
+        """
+        Removes useless data from the downloaded data.
+
+        Returns:
+            None
+        """
         indices_to_drop = []
         for number, row in enumerate(self.data.values):
             if "National holiday" not in row:
