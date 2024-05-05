@@ -117,6 +117,7 @@ fabric.properties
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
+__pycache__
 *.py[cod]
 *$py.class
 
@@ -305,3 +306,5 @@ pyrightconfig.json
 *.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,pycharm
+
+Titanic.ipynb
