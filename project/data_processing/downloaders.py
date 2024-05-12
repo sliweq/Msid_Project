@@ -325,3 +325,33 @@ class HolidaysDataDownloader(Downloader):
             if "National holiday" not in row:
                 indices_to_drop.append(self.data.index[number])
         self.data = self.data.drop(indices_to_drop)
+
+
+class WeatherDataDownloader:
+    def __init__(self, year: int = 2023) -> None:
+        if year < 2001:
+            raise ValueError("Year cannot be less than 2001!")
+        if year > datetime.now().year:
+            raise ValueError("Year cannot be greater than current year!")
+        self.year = year
+        self.url = f"https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteorologiczne/dobowe/klimat/{self.year}"
+
+    def download(self) -> None:
+        for i in range(12):
+            self._download(i + 1)
+
+    def _download(self, m: int) -> None:
+        if m < 10:
+            response = requests.get(self.url + f"/{self.year}_0{m}_k.zip", timeout=5)
+        else:
+            response = requests.get(self.url + f"/{self.year}_{m}_k.zip", timeout=5)
+        if response.status_code == 200:
+            open(f"{self.year}_{m}_k.zip", "wb").write(response.content)
+            return
+
+        logging.error(
+            "Failed to download data, error code %s \nfrom url: %s",
+            response.status_code,
+            self.url + f"{self.year}_{m}_k.zip",
+        )
+        return

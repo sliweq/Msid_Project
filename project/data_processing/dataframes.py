@@ -3,6 +3,10 @@ from dataclasses import dataclass
 import pandas as pd
 
 
+def create_weather_dataframe() -> pd.DataFrame:
+    pass
+
+
 def create_weekends_dataframe(year: int = 2023) -> pd.DataFrame:
     """
     Create a dataframe containing all the weekends (Friday, Saturdays and Sundays) for a given year.
@@ -42,13 +46,16 @@ def create_weekends_dataframe(year: int = 2023) -> pd.DataFrame:
 
 @dataclass
 class Data:
-    policeData: pd.DataFrame
-    holidaysData: pd.DataFrame
+    """A class representing dataframes for police data, holidays data, and weekends."""
+
+    police_data: pd.DataFrame
+    holidays_data: pd.DataFrame
     weekends: pd.DataFrame
     year: int = 2023
 
     def fix_police_data(self) -> bool:
-        if self.policeData:
+        """Fixes the police data dataframe by selecting specific columns."""
+        if self.police_data:
             columns = [
                 "Data",
                 "Wypadki drogowe",
@@ -56,12 +63,14 @@ class Data:
                 "Ranni w wypadkach",
             ]
 
-            self.policeData = self.policeData.loc[:, columns]
+            self.police_data = self.police_data.loc[:, columns]
             return True
         return False
 
     def fix_holidays_data(self) -> bool:
-        if self.holidaysData:
+        """Fixes the holidays data dataframe by selecting specific columns,
+        converting date format, and adding additional columns for month and day."""
+        if self.holidays_data:
             polish_months = {
                 "sty": 1,
                 "lut": 2,
@@ -77,22 +86,22 @@ class Data:
                 "gru": 12,
             }
             columns_list = ["Date", "Name"]
-            self.holidaysData = self.holidaysData.loc[:, columns_list]
-            self.holidaysData.columns = columns_list
-            self.holidaysData = self.holidaysData.reset_index(drop=True)
-            self.holidaysData["Month"] = self.holidaysData["Date"].apply(
+            self.holidays_data = self.holidays_data.loc[:, columns_list]
+            self.holidays_data.columns = columns_list
+            self.holidays_data = self.holidays_data.reset_index(drop=True)
+            self.holidays_data["Month"] = self.holidays_data["Date"].apply(
                 lambda x: polish_months[x.split()[1]]
             )
-            self.holidaysData["Day"] = self.holidaysData["Date"].apply(
+            self.holidays_data["Day"] = self.holidays_data["Date"].apply(
                 lambda x: int(x.split()[0])
             )
-            self.holidaysData["Date"] = pd.to_datetime(
+            self.holidays_data["Date"] = pd.to_datetime(
                 str(self.year)
                 + "-"
-                + self.holidaysData["Month"].astype(str)
+                + self.holidays_data["Month"].astype(str)
                 + "-"
-                + self.holidaysData["Day"].astype(str)
+                + self.holidays_data["Day"].astype(str)
             )
-            self.holidaysData.drop(columns=["Month", "Day"], inplace=True)
+            self.holidays_data.drop(columns=["Month", "Day"], inplace=True)
             return True
         return False
