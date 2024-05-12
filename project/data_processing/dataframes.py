@@ -1,10 +1,67 @@
+import os
 from dataclasses import dataclass
 
 import pandas as pd
 
 
 def create_weather_dataframe() -> pd.DataFrame:
-    pass
+    dataframes = []
+    columns = [
+        "Station Code",
+        "Station Name",
+        "Year",
+        "Month",
+        "Day",
+        "Max Temp",
+        "T MAX Status",
+        "Min Temp",
+        "T MIN Status",
+        "Std Temp",
+        "STD Status",
+        "Ground Temp",
+        "TMNG Status",
+        "Precip Sum",
+        "SMBD Status",
+        "Precip Type",
+        "Snow",
+        "PKSN Status",
+    ]  # based on k_d_format.txt
+
+    # create a list of dataframes
+    for file in os.listdir(os.path.join(os.getcwd(), "project/data")):
+        if file.endswith(".csv"):
+            dataframes.append(
+                pd.read_csv(
+                    os.path.join(os.getcwd(), f"project/data/{file}"),
+                    encoding="unicode_escape",
+                    sep=",",
+                    header=None,
+                    names=columns,
+                )
+            )
+
+    # filter dataframes to only contain data for PSZCZYNA
+    correct_station = []
+    for dataframe in dataframes:
+        correct_station.append(dataframe[dataframe["Station Name"] == "PSZCZYNA"])
+
+    # remove unnecessary columns
+    columns = ["Year", "Month", "Day", "Std Temp", "Precip Sum", "Precip Type"]
+
+    correct_station = [i.loc[:, columns] for i in correct_station]
+    for i in correct_station:
+        i["Date"] = pd.to_datetime(i[["Year", "Month", "Day"]])
+        i.drop(columns=["Year", "Month", "Day"], inplace=True)
+
+    # change order of columns
+    correct_station = [
+        i[["Date", "Std Temp", "Precip Sum", "Precip Type"]] for i in correct_station
+    ]
+
+    data = pd.concat(correct_station)
+    data = data.sort_values(by="Date").reset_index(drop=True)
+    data["Precip Type"] = data["Precip Type"].fillna("-")
+    print(data)
 
 
 def create_weekends_dataframe(year: int = 2023) -> pd.DataFrame:
@@ -48,9 +105,10 @@ def create_weekends_dataframe(year: int = 2023) -> pd.DataFrame:
 class Data:
     """A class representing dataframes for police data, holidays data, and weekends."""
 
-    police_data: pd.DataFrame
-    holidays_data: pd.DataFrame
-    weekends: pd.DataFrame
+    police_data: pd.DataFrame = None
+    holidays_data: pd.DataFrame = None
+    weekends: pd.DataFrame = None
+    weather: pd.DataFrame = None
     year: int = 2023
 
     def fix_police_data(self) -> bool:

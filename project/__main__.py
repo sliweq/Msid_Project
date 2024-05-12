@@ -1,7 +1,7 @@
 import logging
 
-from data_processing.dataframes import \
-    Data  # type: ignore # pylint: disable=import-error
+from data_processing.dataframes import (  # type: ignore # pylint: disable=import-error
+    Data, create_weather_dataframe)
 from data_processing.downloaders import (  # type: ignore # pylint: disable=import-error
     PoliceDataDownloader, WeatherDataDownloader)
 from data_processing.move_data import (delete_useless_files, move_zip_files,
@@ -15,11 +15,14 @@ if __name__ == "__main__":
     setup_logging()
     # p = PoliceDataDownloader()
     # p.download(2024)
-    w = WeatherDataDownloader(2023)
-    w.download()
-    move_zip_files()
-    unzip_files()
-    delete_useless_files()
+
+    # w = WeatherDataDownloader(2022)
+    # w.download()
+    # move_zip_files()
+    # unzip_files()
+    # delete_useless_files()
+
+    create_weather_dataframe()
 
     # data = p.get_data()
     # for i,n in data.iterrows():
