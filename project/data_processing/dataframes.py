@@ -61,7 +61,8 @@ def create_weather_dataframe() -> pd.DataFrame:
     data = pd.concat(correct_station)
     data = data.sort_values(by="Date").reset_index(drop=True)
     data["Precip Type"] = data["Precip Type"].fillna("-")
-    print(data)
+    
+    return data
 
 
 def create_weekends_dataframe(year: int = 2023) -> pd.DataFrame:

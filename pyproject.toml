@@ -19,6 +19,10 @@ bs4 = "^0.0.2"
 lxml = "^5.2.1"
 logging = "^0.4.9.6"
 formatting = "^0.0.1"
+matplotlib = "^3.8.4"
+seaborn = "^0.13.2"
+scikit-learn = "^1.4.2"
+keras = "^3.3.3"
 
 
 [build-system]
