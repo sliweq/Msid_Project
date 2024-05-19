@@ -355,3 +355,19 @@ class WeatherDataDownloader:
             self.url + f"{self.year}_{m}_k.zip",
         )
         return
+
+def save_police_data_to_file(police_data : pd.DataFrame) -> None:
+    """
+    Save the police data to a CSV file in the 'project/data' directory.
+
+    This function saves the police data to a CSV file in the 'project/data' directory.
+    The file is named 'police_data.csv'.
+
+    Args:
+        police_data: DataFrame containing the police data.
+
+    Returns:
+        None
+    """
+    police_data.to_csv("project/data/police_data.csv", index=False)
+    

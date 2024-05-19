@@ -3,6 +3,21 @@ from dataclasses import dataclass
 
 import pandas as pd
 
+def read_police_data_from_cvs() -> pd.DataFrame:
+    """
+    Read the police data from the 'project/data' directory.
+
+    This function reads the police data from the 'project/data' directory.
+    The file is named 'police_data.csv'.
+
+    Returns:
+        pd.DataFrame: DataFrame containing the police data.
+    """
+    # columns = ["Data", "Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"] 
+    
+    df = pd.read_csv("project/data/police_data.csv",encoding="unicode_escape",sep=",")
+    df["Data"] = pd.to_datetime(df["Data"])    
+    return df
 
 def create_weather_dataframe() -> pd.DataFrame:
     dataframes = []
@@ -64,7 +79,6 @@ def create_weather_dataframe() -> pd.DataFrame:
     
     return data
 
-
 def create_weekends_dataframe(year: int = 2023) -> pd.DataFrame:
     """
     Create a dataframe containing all the weekends (Friday, Saturdays and Sundays) for a given year.
@@ -111,10 +125,10 @@ class Data:
     weekends: pd.DataFrame = None
     weather: pd.DataFrame = None
     year: int = 2023
-
+    
     def fix_police_data(self) -> bool:
         """Fixes the police data dataframe by selecting specific columns."""
-        if self.police_data:
+        if self.police_data is not None:
             columns = [
                 "Data",
                 "Wypadki drogowe",
@@ -129,7 +143,7 @@ class Data:
     def fix_holidays_data(self) -> bool:
         """Fixes the holidays data dataframe by selecting specific columns,
         converting date format, and adding additional columns for month and day."""
-        if self.holidays_data:
+        if self.holidays_data is not None:
             polish_months = {
                 "sty": 1,
                 "lut": 2,

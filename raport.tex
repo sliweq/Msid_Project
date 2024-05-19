@@ -1,0 +1,90 @@
+\documentclass{article}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+
+
+\title{Analiza wypadków samochodowych oraz danych pogodowych w Polsce}
+\author{Jakub Śliwka}
+\date{15 May 2022}
+
+\begin{document}
+
+\maketitle
+
+\section{Wstęp}
+Dane zostały pobrane z dzięki uprzjmości serwisów: \url{https://policja.pl/} oraz \url{https://danepubliczne.imgw.pl}.
+Polska jest jednym z czołowych krajów w Europie pod względem liczby śmiertelnych wypadków samochodowych w przeliczeniu na milion mieszkańców.
+Pod tym względem tylko Rumunia, Bułgaria, Litwa i Chorwacja mają gorsze statystyki.x
+
+
+
+\subsection{First Subsection}
+\subsubsection{First Subsubsection}
+
+\section{Text Styles}
+This text is written in \textit{italic}, this text is \underline{underlined}, this text is \textbf{bold} and this \textbf{\textit{\underline{has everything}}}.
+
+\section{Environments}
+\subsection{Lists}
+Unordered lists
+\begin{itemize}
+    \item this
+    \item is
+    \item a 
+    \item list
+\end{itemize}
+Ordered lists
+\begin{enumerate}
+    \item this
+    \item is
+    \item a 
+    \item list
+\end{enumerate}
+
+\subsection{Equations}
+We have inline equations, e.g., the delta equation is $\Delta=b^2-4ac$, but we also have full equations, that we like:
+\begin{equation}
+    \label{eq_sum}
+    \sum_{n=1}^{4} n = 1 + 2 + 3 + 4 = 10 
+\end{equation}
+
+Comment to (\ref{eq_sum}) equation
+\begin{equation}
+    \int_{a}^b f(x)dx = tmp_text
+    \label{eq_integral}
+\end{equation}
+
+Comment to (\ref{eq_integral}) equation
+
+\section{Tables}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|c|r|}
+    \hline
+    Column A with Data & Column C with Data & \textbf{Column C with Data} \\ \hline
+    data 1             & data 3             & \textbf{data 5}             \\ \hline
+    data 2             & data 4             & \textbf{data 6}             \\ \hline
+    \end{tabular}
+    \caption{Table nr 1}
+\end{table}
+Example table generator: \url{https://www.tablesgenerator.com/}
+
+\section{Images}
+\LaTeX\ allows easy inclusion of images in the document.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[scale=0.3]{Jupiter_New_Horizons.jpg}
+    \caption{Jupiter or something idk [\ref{jupiter}]}
+    \label{jupiter}
+\end{figure}
+
+\begin{thebibliography}{9}
+    \bibitem{jupiterb}
+    en.wikipedia.org  \emph{Jupiter New Horizons}
+    Accessed: 04 MArch, 2024.
+\end{thebibliography}
+
+\end{document}
