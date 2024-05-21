@@ -1,4 +1,6 @@
 import logging
+import os
+import time
 from abc import ABC, abstractmethod
 from datetime import datetime
 from io import StringIO
@@ -9,7 +11,110 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+from data_processing.dataframes import (create_weather_dataframe,
+                                        create_weekends_dataframe,
+                                        fix_holidays_data)
+from data_processing.move_data import (delete_useless_files, move_zip_files,
+                                       unzip_files)
+from data_processing.save_data import *
+
 logger = logging.getLogger()
+
+
+def download_data(start_year: int, end_year: int) -> None:
+    """
+    Downloads data for the specified years.
+
+    Args:
+        start_year (int): The start year.
+        end_year (int): The end year.
+
+    Returns:
+        None
+    """
+    if start_year > end_year:
+        start_year, end_year = end_year, start_year
+
+    if not os.path.exists("data/police_data.csv"):
+        save_police_data_to_file(download_police_data(start_year, end_year))
+
+    if not os.path.exists("data/holidays_data.csv"):
+        save_holidays_data_to_file(download_holidays_data(start_year, end_year))
+
+    if not os.path.exists("data/weather_data.csv"):
+        save_weather_data_to_file(download_weather_data(start_year, end_year))
+
+    if not os.path.exists("data/weekends_data.csv"):
+        save_weekends_data_to_file(create_weekends_dataframe(start_year, end_year))
+
+
+def download_police_data(start_year: int, end_year: int) -> pd.DataFrame:
+    """
+    Downloads police data for the specified years.
+
+    Args:
+        start_year (int): The start year.
+        end_year (int): The end year.
+
+    Returns:
+        pd.DataFrame: The downloaded data.
+    """
+    if start_year > end_year:
+        start_year, end_year = end_year, start_year
+
+    data = []
+    for year in range(start_year, end_year + 1):
+        p = PoliceDataDownloader()
+        p.download(year)
+        data.append(p.get_data())
+    return pd.concat(data, ignore_index=True)
+
+
+def download_holidays_data(start_year: int, end_year: int) -> pd.DataFrame:
+    """
+    Downloads holidays data for the specified year.
+
+    Args:
+        year (int): The year for which to download the data.
+
+    Returns:
+        pd.DataFrame: The downloaded data.
+    """
+    if start_year > end_year:
+        start_year, end_year = end_year, start_year
+
+    data = []
+    for year in range(start_year, end_year + 1):
+        h = HolidaysDataDownloader()
+        h.download(year)
+        data.append(fix_holidays_data(h.get_data(), year))
+
+    return pd.concat(data, ignore_index=True)
+
+
+def download_weather_data(start_year: int, end_year: int) -> pd.DataFrame:
+    """
+    Downloads weather data for the specified years.
+
+    Args:
+        start_year (int): The start year.
+        end_year (int): The end year.
+
+    Returns:
+        None
+    """
+    if start_year > end_year:
+        start_year, end_year = end_year, start_year
+
+    for year in range(start_year, end_year + 1):
+        w = WeatherDataDownloader(year)
+        w.download()
+
+    move_zip_files()
+    unzip_files()
+    delete_useless_files()
+
+    return create_weather_dataframe()
 
 
 class Downloader(ABC):  # pylint: disable=too-few-public-methods
@@ -339,6 +444,7 @@ class WeatherDataDownloader:
     def download(self) -> None:
         for i in range(12):
             self._download(i + 1)
+            time.sleep(0.5)
 
     def _download(self, m: int) -> None:
         if m < 10:
@@ -352,22 +458,6 @@ class WeatherDataDownloader:
         logging.error(
             "Failed to download data, error code %s \nfrom url: %s",
             response.status_code,
-            self.url + f"{self.year}_{m}_k.zip",
+            self.url + f"/{self.year}_{m}_k.zip",
         )
         return
-
-def save_police_data_to_file(police_data : pd.DataFrame) -> None:
-    """
-    Save the police data to a CSV file in the 'project/data' directory.
-
-    This function saves the police data to a CSV file in the 'project/data' directory.
-    The file is named 'police_data.csv'.
-
-    Args:
-        police_data: DataFrame containing the police data.
-
-    Returns:
-        None
-    """
-    police_data.to_csv("project/data/police_data.csv", index=False)
-    

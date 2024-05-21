@@ -1,0 +1,11 @@
+Police:
+Data, Wypadki drogowe, Zabici w wypadkach, Ranni w wypadkach
+
+Weather:
+Date, Std Temp, Precip Sum, Precip Type
+
+Weekends:
+Date
+
+Holidays:
+Date, Name

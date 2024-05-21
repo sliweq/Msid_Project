@@ -1,6 +1,7 @@
 import os
 import shutil
-from pandas import DataFrame    
+
+from pandas import DataFrame
 
 
 def move_zip_files() -> None:
@@ -15,7 +16,7 @@ def move_zip_files() -> None:
     """
     for file in os.listdir(os.getcwd()):
         if file.endswith(".zip"):
-            shutil.move(file, os.path.join(os.getcwd(), f"project/data/{file}"))
+            shutil.move(file, os.path.join(os.getcwd(), f"data/{file}"))
 
 
 def unzip_files() -> None:
@@ -29,7 +30,7 @@ def unzip_files() -> None:
     Returns:
         None
     """
-    os.chdir("project/data")
+    os.chdir("data")
     for file in os.listdir(os.getcwd()):
         if file.endswith(".zip"):
             shutil.unpack_archive(file, os.getcwd())
@@ -41,7 +42,7 @@ def delete_useless_files() -> None:
     Deletes all files in the current directory that contain the letter 't' in their name and have a '.csv' extension.
     """
     for file in os.listdir(os.getcwd()):
-        if "t" in file and file.endswith(".csv"):
+        if "k_d_t" in file and file.endswith(".csv"):
             os.remove(file)
 
     os.chdir(os.path.dirname(os.path.dirname(os.getcwd())))
