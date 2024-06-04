@@ -4,13 +4,26 @@ Welcome to my project on msid. I wanted to find correlation of traffic collision
 
 ## Installation
 
+### Poetry
+#### pip
+```bash
+pip install poetry
+```
+#### pipx
+```bash
+pipx install poetry
+```
 
+#### pacman
+```bash
+sudo pacman -S python-poetry
+```
+#### project
 ```bash
 git clone https://github.com/sliweq/Msid_Project.git
 cd Msid_Project
-pip install poetry
-poetry shell
-poetry install
+poetry shell 
+poetry install --no-root
 ```
 
 ## Run
