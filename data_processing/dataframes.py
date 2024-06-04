@@ -4,20 +4,21 @@ from dataclasses import dataclass
 import pandas as pd
 
 
-def read_police_data_from_cvs() -> pd.DataFrame:
+def read_csv_file(file_name: str) -> pd.DataFrame:
     """
-    Read the police data from the 'project/data' directory.
+    Read the data from the 'data' directory.
 
-    This function reads the police data from the 'project/data' directory.
-    The file is named 'police_data.csv'.
+    This function reads the data from the 'data' directory.
 
     Returns:
-        pd.DataFrame: DataFrame containing the police data.
+        pd.DataFrame: DataFrame containing the data.
     """
-    # columns = ["Data", "Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]
 
-    df = pd.read_csv("project/data/police_data.csv", encoding="unicode_escape", sep=",")
-    df["Data"] = pd.to_datetime(df["Data"])
+    df = pd.read_csv(f"data/{file_name}", encoding="unicode_escape", sep=",")
+    if "Data" in df.columns:
+        df["Data"] = pd.to_datetime(df["Data"])
+    else:
+        df["Date"] = pd.to_datetime(df["Date"])
     return df
 
 

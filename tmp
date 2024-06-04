@@ -1,0 +1,90 @@
+\documentclass{article}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{babel,blindtext}
+
+\title{Analiza wypadków samochodowych oraz danych pogodowych w Polsce}
+\author{Jakub Śliwka}
+\date{15 May 2022}
+
+\begin{document}
+
+\maketitle
+
+\section{Wstęp}
+Polska jest jednym z czołowych krajów w Europie pod względem liczby śmiertelnych wypadków samochodowych w przeliczeniu na milion mieszkańców.
+Pod tym względem tylko Rumunia, Bułgaria, Litwa i Chorwacja mają gorsze statystyki.
+Wypadki drogowe są jedną z głównych przyczyn zgonów w Polsce, a dane pogodowe mogą mieć wpływ na ich liczbę.
+
+W niniejszej pracy analizujemy dane dotyczące wypadków drogowych oraz danych pogodowych, aby zrozumieć zależności między tymi zjawiskami. Dane zostały pobrane dzięki uprzejmości serwisów: \url{https://policja.pl/} oraz \url{https://danepubliczne.imgw.pl}.
+
+\section{Analiza danych}
+\subsection{Liczba wypadków drogowych}
+Wykresy liczby wypadków drogowych oraz danych pogodowych przypominają sinusoidę. Wypadki drogowe zdarzają się najczęściej w okresie letnim, a najmniej w okresie zimowym. Ilość osób rannych w wypadkach drogowych również przypomina sinusoidę, co jest związane z ilością wypadków drogowych.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{visualization/accidents_sin.png}
+    \caption{Wykres liczby wypadków drogowych z linią regresji oraz funkcją sinusoidalną}
+    \label{fig:accidents_sin}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{visualization/injured_sin.png}
+    \caption{Wykres poszkodowanych w wypadkach drogowych z linią regresji oraz funkcją sinusoidalną}
+    \label{fig:injured_sin}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{visualization/death_sin.png}
+    \caption{Wykres śmierci w wypadkach drogowych z linią regresji oraz funkcją sinusoidalną}
+    \label{fig:death_sin}
+\end{figure}
+
+Na wszystkich trzech wykresach Data jest tak naprawdę ilością dni od 1 stycznia 2018 roku. 
+
+Na wykresie \ref{fig:accidents_sin} możemy zauważyć tendencję spadkową w przeciągu ostatnich 5 lat. Wykres przypomina malejącą sinusoidę, którą w przybliżeniu można zaprezentować wzorem:
+
+\begin{equation} \label{eq:sin_equation}
+    y = -0.0143x + 81.884 + 20\sin(0.02x - 120) 
+\end{equation}
+
+Oczywiście funkcje przedstawione na wykresie są dużo dokładniejsze, a wzór \ref{eq:sin_equation} jest tylko przybliżeniem.
+
+Podobnie sprawa ma się z wykresami \ref{fig:injured_sin} oraz \ref{fig:death_sin}. Oba wykresy przypominają sinusoidę, a wzory są podobne do wzoru \ref{eq:sin_equation}.
+
+\begin{equation} \label{eq:sin_equation_general}
+    y = ax + b + c\sin(dx -e) 
+\end{equation}
+
+W tym miejscu można by było się zatrzymać i zakończyć analizę wypadków. Wzór ogólny \ref{eq:sin_equation_general} wydaje się dokładnie odzwierciedlać rzeczywistość. Na jego podstawie można by wysnuć tezę, że liczba wypadków z roku na rok maleje.
+
+Co jeżeli obliczyć granicę ze wzoru \ref{eq:sin_equation} przy \(x\) dążącym do nieskończoności?
+
+\begin{equation} \label{eq:limit_sin}
+    \lim_{x\to\infty}(-0.0143x + 81.884 + 20\sin(0.02x - 120))=-\infty
+\end{equation}
+
+Czy oznacza to, że wypadki drogowe w Polsce kiedyś znikną? Wypadków niestety nie da się uniknąć, jednak nie zmienia to rzeczywistego faktu, że w Polsce liczba wypadków z roku na rok maleje.
+
+Jednak wypadki drogowe to nie tylko liczby, ale również ludzie i czynniki zewnętrzne. Warto zastanowić się nad tym, co jeszcze wpływa na ilość wypadków drogowych.
+
+\section{Wpływ pogody na wypadki drogowe}
+Na poprzednich wykresach można było zauważyć korelację pomiędzy porami roku a wypadkami samochodowymi. Warto zobaczyć na wykres średniej dobowej temperatury w Polsce. Z łatwością można zauważyć, że wykres ten jest mocno zbliżony do wykresu przedstawiającego wypadki w Polsce.
+
+Dlaczego akurat lato jest najbardziej niebezpieczną porą roku? Odpowiedź jest banalnie prosta: ładna pogoda usypia czujność kierowców. W trudniejszych warunkach, jakie panują zimą, od kierowców wymagane jest ciągłe skupienie.
+
+Czy opady atmosferyczne powodują większą ilość wypadków samochodowych na drogach? Na pierwszy rzut oka trudno doszukiwać się jakichś korelacji pomiędzy opadami a wypadkami.
+
+W przypadku opadów śniegu trudno doszukiwać się jakiejkolwiek korelacji. Ilość opadów jest mała w porównaniu z opadami deszczu w Polsce. Ponadto podczas zimy, jak wcześniej było wspomniane, jest dużo mniej wypadków niż w czasie lata, co utrudnia analizę tych danych.
+
+\section{Predykcja wypadków w Polsce}
+Ze względu na rodzaj danych zdecydowałem się na wybór \textit{Regressor}'ów. Moim celem jest przewidzenie dokładnej ilości wypadków przy odpowiednich warunkach.
+
+\section{Zakończenie}
+Jak widać, analiza danych pozwala na zrozumienie pewnych zależności i trendów w liczbie wypadków drogowych w Polsce. Warto zwrócić uwagę na wpływ czynników pogodowych oraz innych zmiennych zewnętrznych na liczbę wypadków. Przyszłe badania mogą skupić się na bardziej szczegółowej analizie tych czynników oraz na predykcji liczby wypadków przy użyciu zaawansowanych modeli statystycznych i machine learning.
+
+\end{document}
