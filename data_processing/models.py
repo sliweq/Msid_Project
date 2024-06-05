@@ -1,6 +1,6 @@
 import joblib
-import pandas as pd
 import numpy as np
+import pandas as pd
 from pandas import DataFrame
 from sklearn import svm
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
@@ -8,11 +8,12 @@ from sklearn.linear_model import (LinearRegression, LogisticRegression,
                                   LogisticRegressionCV)
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
-from sklearn.multioutput import MultiOutputRegressor
+from sklearn.multioutput import MultiOutputRegressor, RegressorChain
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.svm import SVC, SVR
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+
 
 def prepare_model_3(
     police: DataFrame,
@@ -20,27 +21,27 @@ def prepare_model_3(
     weekends: DataFrame,
     start_year: int,
     end_year: int,
-    ) -> None:
+) -> None:
     """Model without holidays"""
-    
+
     police = police.set_index("Data")
     weather = weather.set_index("Date")
-    weather['S'] = np.where(weather['Precip Type'] == 'S', weather['Precip Sum'], 0)
-    weather['W'] = np.where(weather['Precip Type'] == 'W', weather['Precip Sum'], 0)
-    weather = weather.drop(columns=["Precip Type","Precip Sum"])
-    
+    weather["S"] = np.where(weather["Precip Type"] == "S", weather["Precip Sum"], 0)
+    weather["W"] = np.where(weather["Precip Type"] == "W", weather["Precip Sum"], 0)
+    weather = weather.drop(columns=["Precip Type", "Precip Sum"])
+
     police = police[["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]]
 
     police = police.join(weather)
     police = police.join(prepare_weekends(weekends, start_year, end_year))
     police = police.dropna()
 
-    y = police[["Wypadki drogowe","Zabici w wypadkach","Ranni w wypadkach"]]
+    y = police[["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]]
 
     X = police.drop(
         columns=["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]
     )
-    
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=42
     )
@@ -56,8 +57,8 @@ def prepare_model_3(
     print(r.score(X_test, y_test))
     print(w.score(X_test, y_test))
 
-    t = {"Std Temp": [3], "S": [0.0], "W":[6.1], "Weekends": [1]}
-    
+    t = {"Std Temp": [3], "S": [0.0], "W": [6.1], "Weekends": [1]}
+
     df = pd.DataFrame(t)
 
     print(model.predict(df))
@@ -68,26 +69,26 @@ def prepare_model_3(
 def prepare_model_2(
     police: DataFrame,
     weather: DataFrame,
-    ) -> None:
+) -> None:
     """Model without weekends and holidays"""
-    
+
     police = police.set_index("Data")
     weather = weather.set_index("Date")
-    weather['S'] = np.where(weather['Precip Type'] == 'S', weather['Precip Sum'], 0)
-    weather['W'] = np.where(weather['Precip Type'] == 'W', weather['Precip Sum'], 0)
-    weather = weather.drop(columns=["Precip Type","Precip Sum"])
-    
+    weather["S"] = np.where(weather["Precip Type"] == "S", weather["Precip Sum"], 0)
+    weather["W"] = np.where(weather["Precip Type"] == "W", weather["Precip Sum"], 0)
+    weather = weather.drop(columns=["Precip Type", "Precip Sum"])
+
     police = police[["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]]
 
     police = police.join(weather)
     police = police.dropna()
 
-    y = police[["Wypadki drogowe","Zabici w wypadkach","Ranni w wypadkach"]]
+    y = police[["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]]
 
     X = police.drop(
         columns=["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]
     )
-    
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=42
     )
@@ -99,12 +100,11 @@ def prepare_model_2(
     r.fit(X_train, y_train)
     w.fit(X_train, y_train)
 
-
     print(model.score(X_test, y_test))
     print(r.score(X_test, y_test))
     print(w.score(X_test, y_test))
 
-    t = {"Std Temp": [3], "S": [0.0], "W":[6.1]}
+    t = {"Std Temp": [3], "S": [0.0], "W": [6.1]}
 
     df = pd.DataFrame(t)
 
@@ -120,15 +120,15 @@ def prepare_model_1(
     weekends: DataFrame,
     start_year: int,
     end_year: int,
-    ) -> None:
+) -> None:
     """Model with specified precipation type"""
     holidays = holidays.drop(columns=["Name"])
     police = police.set_index("Data")
     weather = weather.set_index("Date")
-    weather['S'] = np.where(weather['Precip Type'] == 'S', weather['Precip Sum'], 0)
-    weather['W'] = np.where(weather['Precip Type'] == 'W', weather['Precip Sum'], 0)
-    weather = weather.drop(columns=["Precip Type","Precip Sum"])
-    
+    weather["S"] = np.where(weather["Precip Type"] == "S", weather["Precip Sum"], 0)
+    weather["W"] = np.where(weather["Precip Type"] == "W", weather["Precip Sum"], 0)
+    weather = weather.drop(columns=["Precip Type", "Precip Sum"])
+
     police = police[["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]]
 
     police = police.join(weather)
@@ -136,18 +136,18 @@ def prepare_model_1(
     police = police.join(prepare_holidays(holidays, start_year, end_year))
     police = police.dropna()
 
-    y = police[["Wypadki drogowe","Zabici w wypadkach","Ranni w wypadkach"]]
+    y = police[["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]]
     X = police.drop(
         columns=["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]
     )
-    
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=42
     )
     model = MultiOutputRegressor(RandomForestRegressor(), n_jobs=-1)
     r = MultiOutputRegressor(LinearRegression(), n_jobs=-1)
     w = MultiOutputRegressor(SVR(kernel="linear"), n_jobs=-1)
-
+    print(X.head())
     model.fit(X_train, y_train)
     r.fit(X_train, y_train)
     w.fit(X_train, y_train)
@@ -158,7 +158,7 @@ def prepare_model_1(
     print(r.score(X_test, y_test))
     print(w.score(X_test, y_test))
 
-    t = {"Std Temp": [3], "S": [0.0], "W":[6.1], "Weekends": [1], "Holidays": [1]}
+    t = {"Std Temp": [3], "S": [0.0], "W": [6.1], "Weekends": [1], "Holidays": [1]}
 
     df = pd.DataFrame(t)
 
@@ -188,7 +188,7 @@ def prepare_model(
     police = police.join(prepare_holidays(holidays, start_year, end_year))
     police = police.dropna()
 
-    y = police[["Wypadki drogowe","Zabici w wypadkach","Ranni w wypadkach"]]
+    y = police[["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]]
 
     X = police.drop(
         columns=["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]
@@ -199,16 +199,19 @@ def prepare_model(
     model = MultiOutputRegressor(RandomForestRegressor(), n_jobs=-1)
     r = MultiOutputRegressor(LinearRegression(), n_jobs=-1)
     w = MultiOutputRegressor(SVR(kernel="linear"), n_jobs=-1)
-
+    c = RegressorChain(SVR(kernel="linear"), order=[0, 2, 1])
+    print(X.head())
     model.fit(X_train, y_train)
     r.fit(X_train, y_train)
     w.fit(X_train, y_train)
+    c.fit(X_train, y_train)
 
-    joblib.dump(model, "model.pkl")
+    # joblib.dump(model, "model.pkl")
 
     print(model.score(X_test, y_test))
     print(r.score(X_test, y_test))
     print(w.score(X_test, y_test))
+    print(c.score(X_test, y_test))
 
     t = {"Std Temp": [3], "Precip Sum": [6.1], "Weekends": [1], "Holidays": [1]}
     df = pd.DataFrame(t)
@@ -216,6 +219,7 @@ def prepare_model(
     print(model.predict(df))
     print(r.predict(df))
     print(w.predict(df))
+    print(c.predict(df))
 
 
 def prepare_holidays(holidays: DataFrame, start_year: int, end_year: int) -> DataFrame:

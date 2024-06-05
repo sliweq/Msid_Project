@@ -14,7 +14,9 @@ def read_csv_file(file_name: str) -> pd.DataFrame:
         pd.DataFrame: DataFrame containing the data.
     """
 
-    df = pd.read_csv(f"data/{file_name}", encoding="unicode_escape", sep=",")
+    df = pd.read_csv(
+        os.path.join("data", file_name), encoding="unicode_escape", sep=","
+    )
     if "Data" in df.columns:
         df["Data"] = pd.to_datetime(df["Data"])
     else:
@@ -46,11 +48,11 @@ def create_weather_dataframe() -> pd.DataFrame:
     ]  # based on k_d_format.txt
 
     # create a list of dataframes
-    for file in os.listdir(os.path.join(os.getcwd(), "project/data")):
+    for file in os.listdir(os.path.join(os.getcwd(), "project", "data")):
         if file.endswith(".csv") and "k_d_" in file:
             dataframes.append(
                 pd.read_csv(
-                    os.path.join(os.getcwd(), f"project/data/{file}"),
+                    os.path.join(os.getcwd(), "project", "data", file),
                     encoding="unicode_escape",
                     sep=",",
                     header=None,

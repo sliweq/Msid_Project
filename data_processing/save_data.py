@@ -77,4 +77,4 @@ def save_weekends_data_to_file(weekends_data: pd.DataFrame) -> None:
     """
     if os.path.exists("data/weekends_data.csv"):
         os.remove("data/weekends_data.csv")
-    weekends_data.to_csv("data/weekends_data.csv", index=False)
+    weekends_data.to_csv(os.path.join("data", "weekends_data.csv"), index=False)

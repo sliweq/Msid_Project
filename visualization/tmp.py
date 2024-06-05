@@ -3,11 +3,13 @@ from turtle import color
 import matplotlib.pyplot as plt
 import numpy as np
 from pandas import DataFrame
-from scipy.stats import linregress
 from scipy.optimize import curve_fit
+from scipy.stats import linregress
+
 
 def sinusoidal(x, amplitude, frequency, phase, offset, slope, intercept):
-        return amplitude * np.sin(frequency * (x - phase)) + (slope * x + intercept)
+    return amplitude * np.sin(frequency * (x - phase)) + (slope * x + intercept)
+
 
 def visualize_data(police_data: DataFrame, weather_data: DataFrame) -> None:
     police_accidents_chart(police_data)
@@ -27,31 +29,28 @@ def police_death_chart_sin(df: DataFrame) -> None:
     except TypeError:
         return
 
-    x = np.linspace(0, len(df['Data'])+1, len(df['Data']))
-    
+    x = np.linspace(0, len(df["Data"]) + 1, len(df["Data"]))
+
     slope, intercept, r_value, p_value, std_err = linregress(x, deaths)
     regression_line = slope * x + intercept
     print(f"Regression line for injured: {slope}*x+{intercept}")
-    
-    initial_guess = [20, 0.02, 0, 0,slope,intercept]
+
+    initial_guess = [20, 0.02, 0, 0, slope, intercept]
     params, params_covariance = curve_fit(sinusoidal, x, deaths, p0=initial_guess)
     fitted_accidents = sinusoidal(x, *params)
-    
-    
+
     fig = plt.figure(figsize=(10, 10))
     ax1 = fig.add_subplot(311)
 
-    
     ax1.plot(x, deaths)
     plt.xlabel("Date")
     plt.ylabel("Deaths")
-    plt.plot(x, regression_line, label='Regression line', color='red')
-    
-    ax1.plot(x, fitted_accidents, label='Fitted func')    
-    
+    plt.plot(x, regression_line, label="Regression line", color="red")
+
+    ax1.plot(x, fitted_accidents, label="Fitted func")
+
     fig.suptitle("Death chart with sin and regression line")
     plt.show()
-    
 
 
 def police_injured_chart_sin(df: DataFrame) -> None:
@@ -60,31 +59,29 @@ def police_injured_chart_sin(df: DataFrame) -> None:
     except TypeError:
         return
 
-    x = np.linspace(0, len(df['Data'])+1, len(df['Data']))    
+    x = np.linspace(0, len(df["Data"]) + 1, len(df["Data"]))
     slope, intercept, r_value, p_value, std_err = linregress(x, injured)
-    
-    
+
     regression_line = slope * x + intercept
     print(f"Regression line for injured: {slope}*x+{intercept}")
-    
-    initial_guess = [20, 0.02, 0, 0,slope,intercept]
+
+    initial_guess = [20, 0.02, 0, 0, slope, intercept]
     params, params_covariance = curve_fit(sinusoidal, x, injured, p0=initial_guess)
 
     fitted_accidents = sinusoidal(x, *params)
-    
+
     fig = plt.figure(figsize=(10, 10))
     ax1 = fig.add_subplot(311)
 
-    
-    ax1.plot(x, injured, label='Dane')
-    ax1.plot(x, fitted_accidents, label='Fitted func')    
-    
+    ax1.plot(x, injured, label="Dane")
+    ax1.plot(x, fitted_accidents, label="Fitted func")
+
     plt.xlabel("Date")
-    plt.plot(x, regression_line, label='Regression line', color='red')
-    
+    plt.plot(x, regression_line, label="Regression line", color="red")
+
     fig.suptitle("Injured with sin and regression line")
-    plt.show()  
-    
+    plt.show()
+
 
 def police_accidents_chart_sin(df: DataFrame) -> None:
     try:
@@ -92,32 +89,31 @@ def police_accidents_chart_sin(df: DataFrame) -> None:
     except TypeError:
         return
 
-    x = np.linspace(0, len(df['Data'])+1, len(df['Data']))
-    
+    x = np.linspace(0, len(df["Data"]) + 1, len(df["Data"]))
+
     slope, intercept, r_value, p_value, std_err = linregress(x, accidents)
     regression_line = slope * x + intercept
     # y = 20*np.sin(0.0173*(x-120))+(slope * x + intercept)
     print(f"Regression line for accidents: {slope}*x+{intercept}")
-    
-    initial_guess = [20, 0.02, 0, 0,slope,intercept]
-    
+
+    initial_guess = [20, 0.02, 0, 0, slope, intercept]
+
     params, params_covariance = curve_fit(sinusoidal, x, accidents, p0=initial_guess)
 
-
     fitted_accidents = sinusoidal(x, *params)
-    
-    
+
     fig = plt.figure(figsize=(10, 10))
     ax1 = fig.add_subplot(311)
-    
-    ax1.plot(x, accidents, label='Dane')
-    ax1.plot(x, fitted_accidents, label='Fitted func')    
-    
+
+    ax1.plot(x, accidents, label="Dane")
+    ax1.plot(x, fitted_accidents, label="Fitted func")
+
     plt.xlabel("Date")
-    plt.plot(x, regression_line, label='Regression line', color='red')
-    
+    plt.plot(x, regression_line, label="Regression line", color="red")
+
     fig.suptitle("Accidents with sin and regression line")
     plt.show()
+
 
 def police_data_chart(df: DataFrame) -> None:
     try:
@@ -139,6 +135,7 @@ def police_data_chart(df: DataFrame) -> None:
     ax1.legend(["Deaths", "Injured", "Accidents"])
     fig.suptitle("Police data")
     plt.show()
+
 
 def police_deaths_injured_chart(df: DataFrame) -> None:
     try:
