@@ -12,6 +12,9 @@ def sinusoidal(x, amplitude, frequency, phase, offset, slope, intercept):
 
 
 def visualize_data(police_data: DataFrame, weather_data: DataFrame) -> None:
+    week_accidents_chart(police_data)
+    years_accidents_chart(police_data)
+    months_accidents_chart(police_data)
     police_accidents_chart(police_data)
     police_accidents_chart_sin(police_data)
     police_deaths_injured_chart(police_data)
@@ -22,6 +25,84 @@ def visualize_data(police_data: DataFrame, weather_data: DataFrame) -> None:
     rain_chart(weather_data)
     snow_chart(weather_data)
 
+def week_accidents_chart(df: DataFrame) -> None:
+    try:
+        date = df["Data"].tolist()
+        accidents = df["Wypadki drogowe"].tolist()
+    except TypeError:
+        return
+
+    fig, axs = plt.subplots(1, 1, figsize=(10, 5), sharey=True)
+    l = [[] for _ in range(7)]
+    for d, a in zip(date, accidents):
+        l[d.weekday()].append(a)
+    print([np.average(tmp) for tmp in l])
+    axs.bar([i for i in range(1,8)],[max(tmp) for tmp in l])
+    axs.bar([i for i in range(1,8)],[np.average(tmp) for tmp in l])
+    axs.bar([i for i in range(1,8)],[min(tmp) for tmp in l])
+    plt.title("Accidents in days of week")
+    plt.xlabel("Day of week 1-Monday, 7-Sunday")
+    plt.ylabel("Number of accidents")
+    plt.show()
+
+def years_accidents_chart(df: DataFrame) -> None:
+    try:
+        date = df["Data"].tolist()
+        accidents = df["Wypadki drogowe"].tolist()
+    except TypeError:
+        return
+
+    fig, axs = plt.subplots(2, 3, figsize=(10, 5), sharey=True)
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.year == 2018])]
+    axs[0,0].plot(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.year == 2019])]
+    axs[0,1].plot(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.year == 2020])]
+    axs[0,2].plot(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.year == 2021])]
+    axs[1,0].plot(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.year == 2022])]
+    axs[1,1].plot(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.year == 2023])]
+    axs[1,2].plot(l[0],l[1])
+    plt.title("Accidents per year")    
+    plt.show()
+
+
+def months_accidents_chart(df: DataFrame) -> None:
+    try:
+        date = df["Data"].tolist()
+        accidents = df["Wypadki drogowe"].tolist()
+    except TypeError:
+        return
+
+    fig, axs = plt.subplots(2, 6, figsize=(10, 5), sharey=True)
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.month == 1])]
+    axs[0,0].scatter(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.month == 2])]
+    axs[0,1].scatter(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.month == 3])]
+    axs[0,2].scatter(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.month == 4])]
+    axs[0,3].scatter(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.month == 5])]
+    axs[0,4].scatter(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.month == 6])]
+    axs[0,5].scatter(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.month == 7])]
+    axs[1,0].scatter(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.month == 8])]
+    axs[1,1].scatter(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.month == 9])]
+    axs[1,2].scatter(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.month == 10])]
+    axs[1,3].scatter(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.month == 11])]
+    axs[1,4].scatter(l[0],l[1])
+    l = [list(t) for t in zip(*[ [d,a] for d,a in zip(date, accidents) if d.month == 12])]
+    axs[1,5].scatter(l[0],l[1])
+    plt.title("Accidents per month")
+    plt.show()
 
 def police_death_chart_sin(df: DataFrame) -> None:
     try:
