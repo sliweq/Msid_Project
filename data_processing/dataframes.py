@@ -22,7 +22,7 @@ def read_csv_file(file_name: str) -> pd.DataFrame:
     else:
         df["Date"] = pd.to_datetime(df["Date"])
     if file_name.endswith("police_data.csv"):
-        df.fillna(df.mean(), inplace=True)    
+        df.fillna(df.mean(), inplace=True)
     return df
 
 
