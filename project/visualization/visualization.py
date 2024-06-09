@@ -1,4 +1,4 @@
-from turtle import color
+from typing import Any, List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,11 +7,21 @@ from scipy.optimize import curve_fit
 from scipy.stats import linregress
 
 
-def sinusoidal(x, amplitude, frequency, phase, offset, slope, intercept):
+def sinusoidal(x, amplitude, frequency, phase, slope, intercept):
     return amplitude * np.sin(frequency * (x - phase)) + (slope * x + intercept)
 
 
 def visualize_data(police_data: DataFrame, weather_data: DataFrame) -> None:
+    """
+    Visualizes the police data and weather data using various charts.
+
+    Args:
+        police_data (DataFrame): The police data to be visualized.
+        weather_data (DataFrame): The weather data to be visualized.
+
+    Returns:
+        None
+    """
     week_accidents_chart(police_data)
     years_accidents_chart(police_data)
     months_accidents_chart(police_data)
@@ -27,6 +37,9 @@ def visualize_data(police_data: DataFrame, weather_data: DataFrame) -> None:
 
 
 def week_accidents_chart(df: DataFrame) -> None:
+    """
+    Chart with accidents in days of week.
+    """
     try:
         date = df["Data"].tolist()
         accidents = df["Wypadki drogowe"].tolist()
@@ -34,7 +47,7 @@ def week_accidents_chart(df: DataFrame) -> None:
         return
 
     fig, axs = plt.subplots(1, 1, figsize=(10, 5), sharey=True)
-    l = [[] for _ in range(7)]
+    l: List[List[Any]] = [[] for _ in range(7)]
     for d, a in zip(date, accidents):
         l[d.weekday()].append(a)
     print([np.average(tmp) for tmp in l])
@@ -49,48 +62,31 @@ def week_accidents_chart(df: DataFrame) -> None:
 
 
 def years_accidents_chart(df: DataFrame) -> None:
+    """
+    Chart with accidents per years.
+    """
     try:
         date = df["Data"].tolist()
         accidents = df["Wypadki drogowe"].tolist()
     except TypeError:
         return
 
+    years = [2018, 2019, 2020, 2021, 2022, 2023]
     fig, axs = plt.subplots(2, 3, figsize=(10, 5), sharey=True)
-    l = [
-        list(t)
-        for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.year == 2018])
-    ]
-    axs[0, 0].plot(l[0], l[1])
-    l = [
-        list(t)
-        for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.year == 2019])
-    ]
-    axs[0, 1].plot(l[0], l[1])
-    l = [
-        list(t)
-        for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.year == 2020])
-    ]
-    axs[0, 2].plot(l[0], l[1])
-    l = [
-        list(t)
-        for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.year == 2021])
-    ]
-    axs[1, 0].plot(l[0], l[1])
-    l = [
-        list(t)
-        for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.year == 2022])
-    ]
-    axs[1, 1].plot(l[0], l[1])
-    l = [
-        list(t)
-        for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.year == 2023])
-    ]
-    axs[1, 2].plot(l[0], l[1])
+    for i, year in enumerate(years):
+        list_years = [
+            list(t)
+            for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.year == year])
+        ]
+        axs[i // 3, i % 3].plot(list_years[0], list_years[1])
     plt.title("Accidents per year")
     plt.show()
 
 
 def months_accidents_chart(df: DataFrame) -> None:
+    """
+    Charts with accidents per month.
+    """
     try:
         date = df["Data"].tolist()
         accidents = df["Wypadki drogowe"].tolist()
@@ -98,62 +94,65 @@ def months_accidents_chart(df: DataFrame) -> None:
         return
 
     fig, axs = plt.subplots(2, 6, figsize=(10, 5), sharey=True)
-    l = [
+    list_month = [
         list(t) for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.month == 1])
     ]
-    axs[0, 0].scatter(l[0], l[1])
-    l = [
+    axs[0, 0].scatter(list_month[0], list_month[1])
+    list_month = [
         list(t) for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.month == 2])
     ]
-    axs[0, 1].scatter(l[0], l[1])
-    l = [
+    axs[0, 1].scatter(list_month[0], list_month[1])
+    list_month = [
         list(t) for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.month == 3])
     ]
-    axs[0, 2].scatter(l[0], l[1])
-    l = [
+    axs[0, 2].scatter(list_month[0], list_month[1])
+    list_month = [
         list(t) for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.month == 4])
     ]
-    axs[0, 3].scatter(l[0], l[1])
-    l = [
+    axs[0, 3].scatter(list_month[0], list_month[1])
+    list_month = [
         list(t) for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.month == 5])
     ]
-    axs[0, 4].scatter(l[0], l[1])
-    l = [
+    axs[0, 4].scatter(list_month[0], list_month[1])
+    list_month = [
         list(t) for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.month == 6])
     ]
-    axs[0, 5].scatter(l[0], l[1])
-    l = [
+    axs[0, 5].scatter(list_month[0], list_month[1])
+    list_month = [
         list(t) for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.month == 7])
     ]
-    axs[1, 0].scatter(l[0], l[1])
-    l = [
+    axs[1, 0].scatter(list_month[0], list_month[1])
+    list_month = [
         list(t) for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.month == 8])
     ]
-    axs[1, 1].scatter(l[0], l[1])
-    l = [
+    axs[1, 1].scatter(list_month[0], list_month[1])
+    list_month = [
         list(t) for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.month == 9])
     ]
-    axs[1, 2].scatter(l[0], l[1])
-    l = [
+    axs[1, 2].scatter(list_month[0], list_month[1])
+    list_month = [
         list(t)
         for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.month == 10])
     ]
-    axs[1, 3].scatter(l[0], l[1])
-    l = [
+    axs[1, 3].scatter(list_month[0], list_month[1])
+    list_month = [
         list(t)
         for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.month == 11])
     ]
-    axs[1, 4].scatter(l[0], l[1])
-    l = [
+    axs[1, 4].scatter(list_month[0], list_month[1])
+    list_month = [
         list(t)
         for t in zip(*[[d, a] for d, a in zip(date, accidents) if d.month == 12])
     ]
-    axs[1, 5].scatter(l[0], l[1])
+    axs[1, 5].scatter(list_month[0], list_month[1])
     plt.title("Accidents per month")
     plt.show()
 
 
 def police_death_chart_sin(df: DataFrame) -> None:
+    """
+    Chart with deaths in accidents.
+    """
     try:
         deaths = df["Zabici w wypadkach"].tolist()
     except TypeError:
@@ -173,6 +172,9 @@ def police_death_chart_sin(df: DataFrame) -> None:
 
 
 def police_injured_chart_sin(df: DataFrame) -> None:
+    """
+    Chart with injured in accidents and sin.
+    """
     try:
         injured = df["Ranni w wypadkach"].tolist()
     except TypeError:
@@ -184,7 +186,7 @@ def police_injured_chart_sin(df: DataFrame) -> None:
     regression_line = slope * x + intercept
     print(f"Regression line for injured: {slope}*x+{intercept}")
 
-    initial_guess = [20, 0.02, 0, 0, slope, intercept]
+    initial_guess = [20, 0.02, 0, slope, intercept]
     params, params_covariance = curve_fit(sinusoidal, x, injured, p0=initial_guess)
 
     fitted_accidents = sinusoidal(x, *params)
@@ -203,6 +205,9 @@ def police_injured_chart_sin(df: DataFrame) -> None:
 
 
 def police_accidents_chart_sin(df: DataFrame) -> None:
+    """
+    Chart with amount of accidents and sin.
+    """
     try:
         accidents = df["Wypadki drogowe"].tolist()
     except TypeError:
@@ -215,7 +220,7 @@ def police_accidents_chart_sin(df: DataFrame) -> None:
     # y = 20*np.sin(0.0173*(x-120))+(slope * x + intercept)
     print(f"Regression line for accidents: {slope}*x+{intercept}")
 
-    initial_guess = [20, 0.02, 0, 0, slope, intercept]
+    initial_guess = [20, 0.02, 0, slope, intercept]
 
     params, params_covariance = curve_fit(sinusoidal, x, accidents, p0=initial_guess)
 
@@ -235,6 +240,9 @@ def police_accidents_chart_sin(df: DataFrame) -> None:
 
 
 def police_data_chart(df: DataFrame) -> None:
+    """
+    All police data in one chart.
+    """
     try:
         date = df["Data"].tolist()
         deaths = df["Zabici w wypadkach"].tolist()
@@ -257,6 +265,9 @@ def police_data_chart(df: DataFrame) -> None:
 
 
 def police_deaths_injured_chart(df: DataFrame) -> None:
+    """
+    Police data with deaths and injured in accidents.
+    """
     try:
         date = df["Data"].tolist()
         deaths = df["Zabici w wypadkach"].tolist()
@@ -275,6 +286,9 @@ def police_deaths_injured_chart(df: DataFrame) -> None:
 
 
 def police_deaths_chart(df: DataFrame) -> None:
+    """
+    Police data with deaths in accidents.
+    """
     try:
         date = df["Data"].tolist()
         deaths = df["Wypadki drogowe"].tolist()
@@ -287,6 +301,10 @@ def police_deaths_chart(df: DataFrame) -> None:
 
 
 def police_injured_chart(df: DataFrame) -> None:
+    """
+    Police data with injured in accidents.
+    """
+
     try:
         date = df["Data"].tolist()
         injured = df["Ranni w wypadkach"].tolist()
@@ -299,6 +317,10 @@ def police_injured_chart(df: DataFrame) -> None:
 
 
 def police_accidents_chart(df: DataFrame) -> None:
+    """
+    Chart with accidents.
+    """
+
     try:
         date = df["Data"].tolist()
         accidents = df["Wypadki drogowe"].tolist()
@@ -313,9 +335,13 @@ def police_accidents_chart(df: DataFrame) -> None:
 
 
 def weather_temperature_chart(df: DataFrame) -> None:
+    """
+    Chart with avg temperature.
+    """
+
     try:
         date = df["Date"].tolist()
-        temp = df["Std Temp"].tolist()
+        temp = df["Avg Temp"].tolist()
     except TypeError:
         return
     fig, axs = plt.subplots(1, 1, figsize=(10, 5), sharey=True)
@@ -330,9 +356,12 @@ def weather_temperature_chart(df: DataFrame) -> None:
 
 
 def weather_chart(df: DataFrame) -> None:
+    """
+    All weather data on one chart.
+    """
     try:
         date = df["Date"].tolist()
-        temp = df["Std Temp"].tolist()
+        temp = df["Avg Temp"].tolist()
         prec = df["Precip Sum"].tolist()
     except TypeError:
         return
@@ -351,6 +380,9 @@ def weather_chart(df: DataFrame) -> None:
 
 
 def precip_chart(df: DataFrame) -> None:
+    """
+    Chart with precipitation.
+    """
     try:
         date = df["Date"].tolist()
         prec = df["Precip Sum"].tolist()
@@ -365,6 +397,9 @@ def precip_chart(df: DataFrame) -> None:
 
 
 def snow_chart(df: DataFrame) -> None:
+    """
+    Chart with snow precipitation.
+    """
     try:
         date = df["Date"].tolist()
         prec = df["Precip Sum"].tolist()
@@ -381,6 +416,9 @@ def snow_chart(df: DataFrame) -> None:
 
 
 def rain_chart(df: DataFrame) -> None:
+    """
+    Chart with rain precipitation.
+    """
     try:
         date = df["Date"].tolist()
         prec = df["Precip Sum"].tolist()

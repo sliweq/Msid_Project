@@ -1,8 +1,6 @@
 import os
 import shutil
 
-from pandas import DataFrame
-
 
 def move_zip_files() -> None:
     """
@@ -16,7 +14,7 @@ def move_zip_files() -> None:
     """
     for file in os.listdir(os.getcwd()):
         if file.endswith(".zip"):
-            shutil.move(file, os.path.join(os.getcwd(), f"data/{file}"))
+            shutil.move(file, os.path.join(os.getcwd(), "project", "data", f"{file}"))
 
 
 def unzip_files() -> None:
@@ -30,7 +28,7 @@ def unzip_files() -> None:
     Returns:
         None
     """
-    os.chdir("data")
+    os.chdir(os.path.join("project", "data"))
     for file in os.listdir(os.getcwd()):
         if file.endswith(".zip"):
             shutil.unpack_archive(file, os.getcwd())

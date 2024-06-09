@@ -1,5 +1,4 @@
 import os
-from dataclasses import dataclass
 
 import pandas as pd
 
@@ -15,7 +14,7 @@ def read_csv_file(file_name: str) -> pd.DataFrame:
     """
 
     df = pd.read_csv(
-        os.path.join("data", file_name), encoding="unicode_escape", sep=","
+        os.path.join("project", "data", file_name), encoding="unicode_escape", sep=","
     )
     if "Data" in df.columns:
         df["Data"] = pd.to_datetime(df["Data"])
@@ -27,6 +26,12 @@ def read_csv_file(file_name: str) -> pd.DataFrame:
 
 
 def create_weather_dataframe() -> pd.DataFrame:
+    """
+    Create a weather dataframe containing data for the PSZCZYNA station.
+
+    Returns:
+        pd.DataFrame: A dataframe containing weather data for the PSZCZYNA station.
+    """
     dataframes = []
     columns = [
         "Station Code",
@@ -38,7 +43,7 @@ def create_weather_dataframe() -> pd.DataFrame:
         "T MAX Status",
         "Min Temp",
         "T MIN Status",
-        "Std Temp",
+        "Avg Temp",
         "STD Status",
         "Ground Temp",
         "TMNG Status",
@@ -68,7 +73,7 @@ def create_weather_dataframe() -> pd.DataFrame:
         correct_station.append(dataframe[dataframe["Station Name"] == "PSZCZYNA"])
 
     # remove unnecessary columns
-    columns = ["Year", "Month", "Day", "Std Temp", "Precip Sum", "Precip Type"]
+    columns = ["Year", "Month", "Day", "Avg Temp", "Precip Sum", "Precip Type"]
 
     correct_station = [i.loc[:, columns] for i in correct_station]
     for i in correct_station:
@@ -77,7 +82,7 @@ def create_weather_dataframe() -> pd.DataFrame:
 
     # change order of columns
     correct_station = [
-        i[["Date", "Std Temp", "Precip Sum", "Precip Type"]] for i in correct_station
+        i[["Date", "Avg Temp", "Precip Sum", "Precip Type"]] for i in correct_station
     ]
 
     data = pd.concat(correct_station)
@@ -142,6 +147,16 @@ def fix_police_data(police_data: pd.DataFrame) -> pd.DataFrame:
 
 
 def fix_holidays_data(holidays_data: pd.DataFrame, year: int) -> pd.DataFrame:
+    """
+    Fixes the holidays data by adding a proper date column based on the given year.
+
+    Args:
+        holidays_data (pd.DataFrame): The holidays data to be fixed.
+        year (int): The year to be used for creating the date column.
+
+    Returns:
+        pd.DataFrame: The fixed holidays data with a proper date column.
+    """
 
     polish_months = {
         "sty": 1,

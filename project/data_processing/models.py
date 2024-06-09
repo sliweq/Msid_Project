@@ -1,5 +1,4 @@
 import logging
-from turtle import setup
 from venv import logger
 
 import joblib
@@ -8,22 +7,21 @@ import pandas as pd
 from pandas import DataFrame
 from sklearn import svm
 from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import (LinearRegression, LogisticRegression,
                                   LogisticRegressionCV)
 from sklearn.metrics import (classification_report, make_scorer,
                              mean_absolute_error, mean_squared_error)
 from sklearn.model_selection import GridSearchCV, train_test_split
-from sklearn.multioutput import MultiOutputRegressor, RegressorChain
-from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from sklearn.svm import SVC, SVR
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVR
 
-from setup_logging import setup_logging
+from project.setup_logging import setup_logging
 
-logger = logging.getLogger()
-setup_logging()
+if __name__ == "__main__":
+    logger = logging.getLogger()
+    setup_logging()
 
 
 def prepare_model_1(
@@ -71,7 +69,7 @@ def prepare_model_1(
     print(r.score(X_test, y_test))
     print(w.score(X_test, y_test))
 
-    t = {"Std Temp": [3.5], "S": [0.0], "W": [1.5], "Weekends": [0], "Holidays": [0]}
+    t = {"Avg Temp": [3.5], "S": [0.0], "W": [1.5], "Weekends": [0], "Holidays": [0]}
 
     df = pd.DataFrame(t)
 
@@ -97,7 +95,9 @@ def prepare_model(
 
     police = police.join(weather.set_index("Date"))
     police = police.join(prepare_weekends(weekends, start_year, end_year))
-    police = police.join(prepare_holidays(holidays.drop(columns=["Name"]), start_year, end_year))
+    police = police.join(
+        prepare_holidays(holidays.drop(columns=["Name"]), start_year, end_year)
+    )
     police = police.dropna()
 
     y = police[["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]]
@@ -110,12 +110,12 @@ def prepare_model(
     run_SVR(X, y, prediction)
 
 
-def run_SVR(X: DataFrame, y: DataFrame, predit: list[float]) -> None:
+def run_SVR(X: DataFrame, y: DataFrame, to_predit: list[float]) -> None:
     ct = ColumnTransformer(
-        [("somename", StandardScaler(), ["Std Temp", "Precip Sum"])],
+        [("somename", StandardScaler(), ["Avg Temp", "Precip Sum"])],
         remainder="passthrough",
     )
-    X = ct.fit_transform(X[["Std Temp", "Precip Sum", "Weekends", "Holidays"]])
+    X = ct.fit_transform(X[["Avg Temp", "Precip Sum", "Weekends", "Holidays"]])
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=42
@@ -163,7 +163,7 @@ def find_best_parameters(model, parameters, X, y, verbose=2, n_jobs=-1):
         n_jobs=n_jobs,
         cv=10,
     )
-    
+
     grid_object = grid_object.fit(X, y)
     return grid_object.best_estimator_
 

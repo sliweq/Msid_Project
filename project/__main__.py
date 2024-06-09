@@ -1,19 +1,13 @@
 import logging
 import sys
 from argparse import ArgumentParser, BooleanOptionalAction, Namespace
-from ast import arg
 
-from matplotlib.pylab import f
-
-from data_processing.dataframes import *  # type: ignore # pylint: disable=import-error
-from data_processing.downloaders import *  # type: ignore # pylint: disable=import-error
-from data_processing.models import *  # type: ignore # pylint: disable=import-error
-from data_processing.move_data import *  # type: ignore # pylint: disable=import-error
-from data_processing.save_data import *
-from setup_logging import \
-    setup_logging  # type: ignore # pylint: disable=import-error
-from visualization.stats import print_stats
-from visualization.visualization import *  # type: ignore # pylint: disable=import-error
+from project.data_processing.dataframes import read_csv_file
+from project.data_processing.downloaders import download_data
+from project.data_processing.models import prepare_model
+from project.setup_logging import setup_logging
+from project.visualization.stats import print_stats
+from project.visualization.visualization import visualize_data
 
 logger = logging.getLogger()
 
@@ -60,6 +54,7 @@ if __name__ == "__main__":
 
     if args.force:
         download_data(2018, 2023)
+        sys.exit(0)
 
     police_data = read_csv_file("police_data.csv")
     weather_data = read_csv_file("weather_data.csv")
@@ -70,7 +65,7 @@ if __name__ == "__main__":
         visualize_data(police_data, weather_data)
     if args.statsistics:
         print_stats(police_data, weather_data, holidays_data, weekends_data)
-
+    sys.exit(0)
     prediction = args.values
     if not prediction:
         prediction = [15, 3.1, 0, 0]

@@ -1,5 +1,4 @@
 import logging
-import os
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime
@@ -11,14 +10,20 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from data_processing.dataframes import (create_weather_dataframe,
-                                        create_weekends_dataframe,
-                                        fix_holidays_data)
-from data_processing.move_data import (delete_useless_files, move_zip_files,
-                                       unzip_files)
-from data_processing.save_data import *
+from project.data_processing.dataframes import (create_weather_dataframe,
+                                                create_weekends_dataframe,
+                                                fix_holidays_data)
+from project.data_processing.move_data import (delete_useless_files,
+                                               move_zip_files, unzip_files)
+from project.data_processing.save_data import (save_holidays_data_to_file,
+                                               save_police_data_to_file,
+                                               save_weather_data_to_file,
+                                               save_weekends_data_to_file)
+from project.setup_logging import setup_logging
 
-logger = logging.getLogger()
+if __name__ == "__main__":
+    logger = logging.getLogger()
+    setup_logging()
 
 
 def download_data(start_year: int, end_year: int) -> None:
@@ -35,17 +40,13 @@ def download_data(start_year: int, end_year: int) -> None:
     if start_year > end_year:
         start_year, end_year = end_year, start_year
 
-    if not os.path.exists("data/police_data.csv"):
-        save_police_data_to_file(download_police_data(start_year, end_year))
+    save_police_data_to_file(download_police_data(start_year, end_year))
 
-    if not os.path.exists("data/holidays_data.csv"):
-        save_holidays_data_to_file(download_holidays_data(start_year, end_year))
+    save_weather_data_to_file(download_weather_data(start_year, end_year))
 
-    if not os.path.exists("data/weather_data.csv"):
-        save_weather_data_to_file(download_weather_data(start_year, end_year))
+    save_holidays_data_to_file(download_holidays_data(start_year, end_year))
 
-    if not os.path.exists("data/weekends_data.csv"):
-        save_weekends_data_to_file(create_weekends_dataframe(start_year, end_year))
+    save_weekends_data_to_file(create_weekends_dataframe(start_year, end_year))
 
 
 def download_police_data(start_year: int, end_year: int) -> pd.DataFrame:
@@ -355,14 +356,22 @@ class HolidaysDataDownloader(Downloader):
     def __init__(
         self, url: str = "https://www.timeanddate.com/holidays/poland/"
     ) -> None:
+        """
+        Initialize the Downloader object.
+
+        Args:
+            url (str, optional): The URL to download data from. Defaults to "https://www.timeanddate.com/holidays/poland/".
+        """
         super().__init__(url)
         self.data: pd.DataFrame = None
         self.year: Optional[int] = None
 
     def get_data(self) -> pd.DataFrame:
+        """Get the downloaded data."""
         return self.data
 
     def get_year(self) -> Optional[int]:
+        """Get the year."""
         return self.year
 
     def download(self, year: int = 2023) -> None:
@@ -433,7 +442,28 @@ class HolidaysDataDownloader(Downloader):
 
 
 class WeatherDataDownloader:
+    """
+    A class for downloading weather data for a specific year.
+
+    Attributes:
+    - year (int): The year for which the weather data will be downloaded.
+    - url (str): The URL to download the weather data from.
+
+    Methods:
+    - download(): Downloads the weather data for all months of the specified year.
+    """
+
     def __init__(self, year: int = 2023) -> None:
+        """
+        Initializes a WeatherDataDownloader object.
+
+        Args:
+        - year (int): The year for which the weather data will be downloaded.
+                      Defaults to 2023.
+
+        Raises:
+        - ValueError: If the year is less than 2001 or greater than the current year.
+        """
         if year < 2001:
             raise ValueError("Year cannot be less than 2001!")
         if year > datetime.now().year:
@@ -442,11 +472,20 @@ class WeatherDataDownloader:
         self.url = f"https://danepubliczne.imgw.pl/data/dane_pomiarowo_obserwacyjne/dane_meteorologiczne/dobowe/klimat/{self.year}"
 
     def download(self) -> None:
+        """
+        Downloads the weather data for all months of the specified year.
+        """
         for i in range(12):
             self._download(i + 1)
             time.sleep(0.5)
 
     def _download(self, m: int) -> None:
+        """
+        Downloads the weather data for a specific month of the specified year.
+
+        Args:
+        - m (int): The month for which the weather data will be downloaded.
+        """
         if m < 10:
             response = requests.get(self.url + f"/{self.year}_0{m}_k.zip", timeout=5)
         else:

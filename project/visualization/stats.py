@@ -1,24 +1,10 @@
-from cProfile import label
 from math import floor
+from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib import axes
 from scipy.stats import linregress
-
-#         Date
-# 0 2018-01-05
-# 1 2018-01-06
-# 2 2018-01-07
-# 3 2018-01-12
-# 4 2018-01-13
-#         Date                 Name
-# 0 2018-01-01       New Year's Day
-# 1 2018-01-06             Epiphany
-# 2 2018-04-01        Easter Sunday
-# 3 2018-04-02        Easter Monday
-# 4 2018-05-01  Labor Day / May Day
 
 
 def print_stats(
@@ -27,6 +13,18 @@ def print_stats(
     holidays_data: pd.DataFrame,
     weekends_data: pd.DataFrame,
 ) -> None:
+    """
+    Prints various statistics based on the provided data.
+
+    Args:
+        police_data (pd.DataFrame): DataFrame containing police data.
+        weather_data (pd.DataFrame): DataFrame containing weather data.
+        holidays_data (pd.DataFrame): DataFrame containing holidays data.
+        weekends_data (pd.DataFrame): DataFrame containing weekends data.
+
+    Returns:
+        None
+    """
 
     temperature_accidents_regress(police_data, weather_data)
     temperature_accidents(police_data, weather_data)
@@ -38,6 +36,7 @@ def print_stats(
 def normal_vs_rest(
     police_data: pd.DataFrame, holidays_data: pd.DataFrame, weekends_data: pd.DataFrame
 ) -> None:
+    """Compares the number of accidents on normal days, holidays and weekends."""
     try:
         date = police_data["Data"].tolist()
         accidents = police_data["Wypadki drogowe"].tolist()
@@ -46,8 +45,8 @@ def normal_vs_rest(
         weekends = weekends_data["Date"].tolist()
     except TypeError:
         return
-    accidents_holiday = []
-    accidents_weekend = []
+    accidents_holiday: List[int] = []
+    accidents_weekend: List[int] = []
 
     for i in range(len(date)):
         if len(date) - i - 1 >= 0:
@@ -93,6 +92,7 @@ def normal_vs_rest(
 
 
 def normal_vs_rain(police_data: pd.DataFrame, weather_data: pd.DataFrame) -> None:
+    """Compares the number of accidents on normal days and rainy."""
     try:
         date = police_data["Data"].tolist()
         accidents = police_data["Wypadki drogowe"].tolist()
@@ -132,6 +132,7 @@ def normal_vs_rain(police_data: pd.DataFrame, weather_data: pd.DataFrame) -> Non
 def normal_vs_rain_vs_snow(
     police_data: pd.DataFrame, weather_data: pd.DataFrame
 ) -> None:
+    """Compares the number of accidents on normal days, rainy and snowy."""
     try:
         date = police_data["Data"].tolist()
         accidents = police_data["Wypadki drogowe"].tolist()
@@ -176,6 +177,7 @@ def normal_vs_rain_vs_snow(
 def temperature_accidents(
     police_data: pd.DataFrame, weather_data: pd.DataFrame
 ) -> None:
+    """Compares the number of accidents on different temperatures."""
     try:
         date = police_data["Data"].tolist()
         accidents = police_data["Wypadki drogowe"].tolist()
@@ -184,7 +186,7 @@ def temperature_accidents(
     except TypeError:
         return
 
-    accidents_temperature = {}
+    accidents_temperature: Dict[int, List[int]] = {}
     for i in range(len(date)):
         if floor(temperature[len(date) - i - 1]) not in accidents_temperature.keys():
             accidents_temperature[floor(temperature[len(date) - i - 1])] = []
@@ -219,6 +221,7 @@ def temperature_accidents(
 def temperature_accidents_regress(
     police_data: pd.DataFrame, weather_data: pd.DataFrame
 ) -> None:
+    """Compares the number of accidents on different temperatures with regression line."""
     try:
         date = police_data["Data"].tolist()
         accidents = police_data["Wypadki drogowe"].tolist()
@@ -227,7 +230,7 @@ def temperature_accidents_regress(
     except TypeError:
         return
 
-    accidents_temperature = {}
+    accidents_temperature: Dict[int, List[int]] = {}
     for i in range(len(date)):
         if floor(temperature[len(date) - i - 1]) not in accidents_temperature.keys():
             accidents_temperature[floor(temperature[len(date) - i - 1])] = []
@@ -251,7 +254,7 @@ def temperature_accidents_regress(
     regression_line = int(slope) * list(accidents_temperature.keys()) + intercept
 
     plt.plot(
-        accidents_temperature.keys(),
+        list(accidents_temperature.keys()),
         regression_line,
         label="Regression line",
         color="red",
