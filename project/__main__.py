@@ -68,7 +68,7 @@ if __name__ == "__main__":
     
     prediction = args.values
     if not prediction:
-        prediction = [15, 3.1, 0, 0]
+        prediction = [15, 3.1, 1, 0]
     if len(prediction) != 4:
         logger.error("Please provide 4 values to predict")
         sys.exit(1)
@@ -76,4 +76,4 @@ if __name__ == "__main__":
     prepare_model(
         police_data, weather_data, holidays_data, weekends_data, 2018, 2023, prediction
     )
-    prepare_model_1(police_data, weather_data, holidays_data, weekends_data, 2018, 2023)
+    prepare_model_1(police_data, weather_data, holidays_data, weekends_data, 2018, 2023, [15, 3.1, 0,1, 0])

@@ -31,46 +31,28 @@ def prepare_model_1(
     weekends: DataFrame,
     start_year: int,
     end_year: int,
+    prediction: list[float],
 ) -> None:
     """Model with specified precipation type"""
-    holidays = holidays.drop(columns=["Name"])
+    
     police = police.set_index("Data")
     weather = weather.set_index("Date")
     weather["S"] = np.where(weather["Precip Type"] == "S", weather["Precip Sum"], 0)
     weather["W"] = np.where(weather["Precip Type"] == "W", weather["Precip Sum"], 0)
-    weather = weather.drop(columns=["Precip Type", "Precip Sum"])
 
     police = police[["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]]
 
-    police = police.join(weather)
+    police = police.join(weather.drop(columns=["Precip Type", "Precip Sum"]))
     police = police.join(prepare_weekends(weekends, start_year, end_year))
-    police = police.join(prepare_holidays(holidays, start_year, end_year))
+    police = police.join(prepare_holidays(holidays.drop(columns=["Name"]), start_year, end_year))
     police = police.dropna()
 
     y = police[["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]]
     X = police.drop(
         columns=["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]
     )
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
-    
-    t = {"Avg Temp": [3.5], "S": [0.0], "W": [1.5], "Weekends": [0], "Holidays": [0]}
-
-    df = pd.DataFrame(t)
-    
-    # svr = MultiOutputRegressor(SVR(kernel="linear"), n_jobs=-1)
-    # svr.fit(X_train, y_train)
-    # print(svr.score(X_test, y_test))
-    # print(svr.predict(df))
-    rfr = RandomForestRegressor(n_estimators=10)
-    rfr = find_best_parameters(rfr, {"n_estimators": [10, 100, 1000]}, X, y)
-    print(rfr)
-    #rfr.fit(X_train, y_train)
-    print(rfr.score(X_test, y_test))
-    print(rfr.predict(df))
-    print(f"MAE: {mean_absolute_error(y_test, rfr.predict(X_test))}")
+    run_SVR_1(X, y, prediction)
+    run_RandomForestRegressor(X, y, prediction)
 
 
 
@@ -106,6 +88,24 @@ def prepare_model(
     run_RandomForestRegressor(X, y, prediction)
     run_SVR(X, y, prediction)
 
+def run_SVR_1(X: DataFrame, y: DataFrame, to_predit: list[float]) -> None:
+    ct = ColumnTransformer(
+        [("somename", StandardScaler(), ["Avg Temp", "W", "S"])],
+        remainder="passthrough",
+    )
+    X = ct.fit_transform(X[["Avg Temp", "W", "S", "Weekends", "Holidays"]])
+    
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+    
+    svr = SVR(kernel="rbf",C=1,gamma=0.001)
+    mor = MultiOutputRegressor(svr, n_jobs=-1)
+    mor.fit(X_train, y_train)
+    
+    logger.info(f"MAE: {mean_absolute_error(y_test, mor.predict(X_test))}")
+    logger.info(f"SVR_1 score: {mor.score(X_test, y_test)}")
+    logger.info(f"SVR_1 prediction for {to_predit}:{mor.predict(pd.DataFrame([to_predit]))}")
 
 def run_SVR(X: DataFrame, y: DataFrame, to_predit: list[float]) -> None:
     ct = ColumnTransformer(
@@ -120,16 +120,13 @@ def run_SVR(X: DataFrame, y: DataFrame, to_predit: list[float]) -> None:
 
     svr = SVR(kernel="rbf", C=4, gamma=10)
 
-    # rbf, 10/0,001, 1/4/1
-
     mor = MultiOutputRegressor(svr, n_jobs=-1)
     mor.fit(X_train, y_train)
 
     logger.info(f"MAE: {mean_absolute_error(y_test, mor.predict(X_test))}")
+    logger.info(f"SVR score: {mor.score(X_test, y_test)}")
+    logger.info(f"SVR prediction for {to_predit}:{mor.predict(pd.DataFrame([to_predit]))}")
 
-    print(
-        f"SVR prediction for {to_predit}:{mor.predict([to_predit])}"
-    )
 
 
 def run_RandomForestRegressor(
@@ -138,17 +135,14 @@ def run_RandomForestRegressor(
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=42
     )
-    rfr = RandomForestRegressor()
+    rfr = RandomForestRegressor(n_estimators=10, n_jobs=-1)
 
     rfr.fit(X_train, y_train)
 
-    logger.info(f"MAE: {mean_absolute_error(y_test, rfr.predict(X_test))}")
-
     to_predit = dict(zip(X.columns, to_predit))
-    print(to_predit)
-    print(
-        f"Random forest regressor prediction for {to_predit}:{rfr.predict(pd.DataFrame([to_predit]))}"
-    )
+    logger.info(f"MAE: {mean_absolute_error(y_test, rfr.predict(X_test))}")
+    logger.info(f"Random forest regressor score: {rfr.score(X_test, y_test)}")
+    logger.info(f"Random forest regressor prediction for {to_predit}:{rfr.predict(pd.DataFrame([to_predit]))}")
 
 
 def find_best_parameters(model, parameters, X, y, verbose=2, n_jobs=-1):
