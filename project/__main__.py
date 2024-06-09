@@ -4,7 +4,7 @@ from argparse import ArgumentParser, BooleanOptionalAction, Namespace
 
 from project.data_processing.dataframes import read_csv_file
 from project.data_processing.downloaders import download_data
-from project.data_processing.models import prepare_model
+from project.data_processing.models import prepare_model, prepare_model_1
 from project.setup_logging import setup_logging
 from project.visualization.stats import print_stats
 from project.visualization.visualization import visualize_data
@@ -65,7 +65,7 @@ if __name__ == "__main__":
         visualize_data(police_data, weather_data)
     if args.statsistics:
         print_stats(police_data, weather_data, holidays_data, weekends_data)
-    sys.exit(0)
+    
     prediction = args.values
     if not prediction:
         prediction = [15, 3.1, 0, 0]
@@ -76,4 +76,4 @@ if __name__ == "__main__":
     prepare_model(
         police_data, weather_data, holidays_data, weekends_data, 2018, 2023, prediction
     )
-    # prepare_model_1(police_data, weather_data, holidays_data, weekends_data, 2018, 2023)
+    prepare_model_1(police_data, weather_data, holidays_data, weekends_data, 2018, 2023)

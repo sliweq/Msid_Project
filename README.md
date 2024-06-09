@@ -30,7 +30,7 @@ poetry install --no-root
 ## Run
 
 ```bash
-python project/__main__.py
+python -m project
 ```
 ### Run with args
 

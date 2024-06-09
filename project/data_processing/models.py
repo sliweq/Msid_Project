@@ -55,27 +55,24 @@ def prepare_model_1(
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
-    model = MultiOutputRegressor(RandomForestRegressor(), n_jobs=-1)
-    r = MultiOutputRegressor(LinearRegression(), n_jobs=-1)
-    w = MultiOutputRegressor(SVR(kernel="linear"), n_jobs=-1)
-    print(X.head())
-    model.fit(X_train, y_train)
-    r.fit(X_train, y_train)
-    w.fit(X_train, y_train)
-
-    joblib.dump(model, "model.pkl")
-
-    print(model.score(X_test, y_test))
-    print(r.score(X_test, y_test))
-    print(w.score(X_test, y_test))
-
+    
     t = {"Avg Temp": [3.5], "S": [0.0], "W": [1.5], "Weekends": [0], "Holidays": [0]}
 
     df = pd.DataFrame(t)
+    
+    # svr = MultiOutputRegressor(SVR(kernel="linear"), n_jobs=-1)
+    # svr.fit(X_train, y_train)
+    # print(svr.score(X_test, y_test))
+    # print(svr.predict(df))
+    rfr = RandomForestRegressor(n_estimators=10)
+    rfr = find_best_parameters(rfr, {"n_estimators": [10, 100, 1000]}, X, y)
+    print(rfr)
+    #rfr.fit(X_train, y_train)
+    print(rfr.score(X_test, y_test))
+    print(rfr.predict(df))
+    print(f"MAE: {mean_absolute_error(y_test, rfr.predict(X_test))}")
 
-    print(model.predict(df))
-    print(r.predict(df))
-    print(w.predict(df))
+
 
 
 def prepare_model(
@@ -130,9 +127,8 @@ def run_SVR(X: DataFrame, y: DataFrame, to_predit: list[float]) -> None:
 
     logger.info(f"MAE: {mean_absolute_error(y_test, mor.predict(X_test))}")
 
-    to_predit = dict(zip(X.columns, to_predit))
     print(
-        f"Random forest regressor prediction for {to_predit}:{mor.predict([to_predit])}"
+        f"SVR prediction for {to_predit}:{mor.predict([to_predit])}"
     )
 
 
@@ -149,8 +145,9 @@ def run_RandomForestRegressor(
     logger.info(f"MAE: {mean_absolute_error(y_test, rfr.predict(X_test))}")
 
     to_predit = dict(zip(X.columns, to_predit))
+    print(to_predit)
     print(
-        f"Random forest regressor prediction for {to_predit}:{rfr.predict([to_predit])}"
+        f"Random forest regressor prediction for {to_predit}:{rfr.predict(pd.DataFrame([to_predit]))}"
     )
 
 
