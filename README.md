@@ -18,7 +18,7 @@ pipx install poetry
 ```bash
 sudo pacman -S python-poetry
 ```
-#### project
+### Project
 ```bash
 git clone https://github.com/sliweq/Msid_Project.git
 cd Msid_Project
@@ -33,10 +33,10 @@ python project/__main__.py
 ```
 ### Run with args
 
-- F force downloading data
-- S show statistics
-- V show visualizations
-- 12 3.5 0 0
+- F - force downloading data
+- S - show statistics
+- V - show visualizations
+- 12 - 3.5 0 0
     - Avg temperature
     - Precipitations
     - Weekend (0-No,1-Yes)
