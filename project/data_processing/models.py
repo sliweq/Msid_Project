@@ -1,19 +1,29 @@
+import logging
+from turtle import setup
+from venv import logger
+
 import joblib
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
 from sklearn import svm
+from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import (LinearRegression, LogisticRegression,
                                   LogisticRegressionCV)
-from sklearn.metrics import (classification_report, make_scorer, mean_absolute_error,
-                             mean_squared_error)
+from sklearn.metrics import (classification_report, make_scorer,
+                             mean_absolute_error, mean_squared_error)
 from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.multioutput import MultiOutputRegressor, RegressorChain
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
-from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.svm import SVC, SVR
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+
+from setup_logging import setup_logging
+
+logger = logging.getLogger()
+setup_logging()
 
 
 def prepare_model_1(
@@ -77,18 +87,17 @@ def prepare_model(
     weekends: DataFrame,
     start_year: int,
     end_year: int,
+    prediction: list[float],
 ) -> None:
     """Model with all data"""
     weather = weather.drop(columns=["Precip Type"])
-    holidays = holidays.drop(columns=["Name"])
     police = police.set_index("Data")
-    weather = weather.set_index("Date")
 
     police = police[["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]]
 
-    police = police.join(weather)
+    police = police.join(weather.set_index("Date"))
     police = police.join(prepare_weekends(weekends, start_year, end_year))
-    police = police.join(prepare_holidays(holidays, start_year, end_year))
+    police = police.join(prepare_holidays(holidays.drop(columns=["Name"]), start_year, end_year))
     police = police.dropna()
 
     y = police[["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]]
@@ -96,47 +105,53 @@ def prepare_model(
     X = police.drop(
         columns=["Wypadki drogowe", "Zabici w wypadkach", "Ranni w wypadkach"]
     )
-    from sklearn.compose import ColumnTransformer
-    from sklearn.preprocessing import StandardScaler
 
-    # ct = ColumnTransformer([("somename",StandardScaler(),["Std Temp","Precip Sum"])],remainder='passthrough')
-    # X = ct.fit_transform(X[["Std Temp","Precip Sum",  "Weekends" , "Holidays"]])
-    # print(X)
+    run_RandomForestRegressor(X, y, prediction)
+    run_SVR(X, y, prediction)
+
+
+def run_SVR(X: DataFrame, y: DataFrame, predit: list[float]) -> None:
+    ct = ColumnTransformer(
+        [("somename", StandardScaler(), ["Std Temp", "Precip Sum"])],
+        remainder="passthrough",
+    )
+    X = ct.fit_transform(X[["Std Temp", "Precip Sum", "Weekends", "Holidays"]])
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=42
     )
-    model = RandomForestRegressor()
-    svm = SVR()
-    # w = SVR(kernel="linear")
-    # print(X.head())
-    # model.fit(X_train, y_train)
-    # parameters = {'C': [1.0, 2.0, 4.0], 
-    #           'gamma': [0.001, 0.1, 1., 10.]
-    #          }
 
-    # svm = find_best_parameters(svm, parameters, X_train, y_train)
-    
+    svr = SVR(kernel="rbf", C=4, gamma=10)
+
     # rbf, 10/0,001, 1/4/1
-    svm = RandomForestRegressor(n_estimators=10, max_depth=1, bootstrap=True, n_jobs=-1)
-    #svm = MultiOutputRegressor(SVR(kernel="rbf",C=4,gamma=10), n_jobs=-1)
-    svm.fit(X_train, y_train)
-    
-    # w.fit(X_train, y_train)
 
-    # joblib.dump(model, "model.pkl")
+    mor = MultiOutputRegressor(svr, n_jobs=-1)
+    mor.fit(X_train, y_train)
 
-    # print(model.score(X_test, y_test))
-    print(svm.score(X_test, y_test))
-    # print(w.score(X_test, y_test))
+    logger.info(f"MAE: {mean_absolute_error(y_test, mor.predict(X_test))}")
 
-    # t = {"Std Temp": [3.5], "Precip Sum": [1.5], "Weekends": [0], "Holidays": [0]}
-    # df = pd.DataFrame(t)
-    df = [[3.5, 1.5, 0, 0]]
-    # print(model.predict(df))
-    print(svm.predict(df))
-    from sklearn.metrics import mean_absolute_error
-    print(mean_absolute_error(y_test, svm.predict(X_test)))
-    # print(w.predict(df))
+    to_predit = dict(zip(X.columns, to_predit))
+    print(
+        f"Random forest regressor prediction for {to_predit}:{mor.predict([to_predit])}"
+    )
+
+
+def run_RandomForestRegressor(
+    X: DataFrame, y: DataFrame, to_predit: list[float]
+) -> None:
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.3, random_state=42
+    )
+    rfr = RandomForestRegressor()
+
+    rfr.fit(X_train, y_train)
+
+    logger.info(f"MAE: {mean_absolute_error(y_test, rfr.predict(X_test))}")
+
+    to_predit = dict(zip(X.columns, to_predit))
+    print(
+        f"Random forest regressor prediction for {to_predit}:{rfr.predict([to_predit])}"
+    )
 
 
 def find_best_parameters(model, parameters, X, y, verbose=2, n_jobs=-1):
@@ -148,7 +163,7 @@ def find_best_parameters(model, parameters, X, y, verbose=2, n_jobs=-1):
         n_jobs=n_jobs,
         cv=10,
     )
-    print(y.head())
+    
     grid_object = grid_object.fit(X, y)
     return grid_object.best_estimator_
 

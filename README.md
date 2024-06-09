@@ -31,6 +31,16 @@ poetry install --no-root
 ```bash
 python project/__main__.py
 ```
+### Run with args
+
+- F force downloading data
+- S show statistics
+- V show visualizations
+- 12 3.5 0 0
+    - Avg temperature
+    - Precipitations
+    - Weekend (0-No,1-Yes)
+    - Holiday (0-No,1-Yes)
 
 ## Sources
 
