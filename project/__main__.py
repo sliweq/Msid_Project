@@ -4,7 +4,7 @@ from argparse import ArgumentParser, BooleanOptionalAction, Namespace
 
 from project.data_processing.dataframes import read_csv_file
 from project.data_processing.downloaders import download_data
-from project.data_processing.models import prepare_model_RF_and_GB, prepare_model_SVR
+from project.data_processing.models import prepare_model_rfr, prepare_model_svr
 from project.setup_logging import setup_logging
 from project.visualization.stats import print_stats
 from project.visualization.visualization import visualize_data
@@ -57,9 +57,22 @@ if __name__ == "__main__":
         visualize_data(police_data, weather_data)
     if args.statsistics:
         print_stats(police_data, weather_data, holidays_data, weekends_data)
-    
-    
-    prepare_model_SVR(police_data, weather_data, holidays_data, weekends_data, 2018, 2023, [15, 3.1,0,1])
-    prepare_model_RF_and_GB(police_data, weather_data, holidays_data, weekends_data, 2018, 2023, [6,0,15, 3.1, 0,1, 0])
-    
-    
+
+    prepare_model_svr(
+        police_data,
+        weather_data,
+        holidays_data,
+        weekends_data,
+        2018,
+        2023,
+        [15, 3.1, 0, 1, 430],
+    )
+    prepare_model_rfr(
+        police_data,
+        weather_data,
+        holidays_data,
+        weekends_data,
+        2018,
+        2023,
+        [6, 0, 15, 4.1, 0, 1, 0, 430],
+    )

@@ -15,7 +15,7 @@ def setup_logging() -> None:
         None
     """
     logging.basicConfig(
-        #filename="project.log",
+        # filename="project.log",
         level=logging.INFO,
         format="%(levelname)s <%(threadName)s> %(message)s",
     )

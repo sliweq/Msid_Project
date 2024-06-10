@@ -7,7 +7,10 @@ from scipy.optimize import curve_fit
 from scipy.stats import linregress
 
 
-def sinusoidal(x, amplitude, frequency, phase, slope, intercept):
+def sinusoidal(x, amplitude, frequency, phase, slope, intercept):  # type: ignore[no-untyped-def]
+    """
+    Calculate the value of a sinusoidal function at a given point.
+    """
     return amplitude * np.sin(frequency * (x - phase)) + (slope * x + intercept)
 
 
@@ -51,9 +54,9 @@ def week_accidents_chart(df: DataFrame) -> None:
     for d, a in zip(date, accidents):
         l[d.weekday()].append(a)
     print([np.average(tmp) for tmp in l])
-    axs.bar([i for i in range(1, 8)], [max(tmp) for tmp in l])
-    axs.bar([i for i in range(1, 8)], [np.average(tmp) for tmp in l])
-    axs.bar([i for i in range(1, 8)], [min(tmp) for tmp in l])
+    axs.bar(list(range(1, 8)), [max(tmp) for tmp in l])
+    axs.bar(list(range(1, 8)), [np.average(tmp) for tmp in l])
+    axs.bar(list(range(1, 8)), [min(tmp) for tmp in l])
     plt.title("Accidents in days of week")
     plt.xlabel("Day of week 1-Monday, 7-Sunday")
     plt.ylabel("Number of accidents")
