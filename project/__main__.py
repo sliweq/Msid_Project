@@ -4,7 +4,7 @@ from argparse import ArgumentParser, BooleanOptionalAction, Namespace
 
 from project.data_processing.dataframes import read_csv_file
 from project.data_processing.downloaders import download_data
-from project.data_processing.models import prepare_model, prepare_model_1
+from project.data_processing.models import prepare_model_RF_and_GB, prepare_model_SVR
 from project.setup_logging import setup_logging
 from project.visualization.stats import print_stats
 from project.visualization.visualization import visualize_data
@@ -28,14 +28,6 @@ def parse_args() -> Namespace:
         action=BooleanOptionalAction,
         default=False,
         help="Print statsistics",
-    )
-    parser.add_argument(
-        "values",
-        metavar="N",
-        type=float,
-        nargs="*",
-        default=[],
-        help="Data used to predict: temperature, precipitation, weekends, holidays",
     )
     parser.add_argument(
         "-F",
@@ -66,14 +58,8 @@ if __name__ == "__main__":
     if args.statsistics:
         print_stats(police_data, weather_data, holidays_data, weekends_data)
     
-    prediction = args.values
-    if not prediction:
-        prediction = [15, 3.1, 1, 0]
-    if len(prediction) != 4:
-        logger.error("Please provide 4 values to predict")
-        sys.exit(1)
-
-    prepare_model(
-        police_data, weather_data, holidays_data, weekends_data, 2018, 2023, prediction
-    )
-    prepare_model_1(police_data, weather_data, holidays_data, weekends_data, 2018, 2023, [15, 3.1, 0,1, 0])
+    
+    prepare_model_SVR(police_data, weather_data, holidays_data, weekends_data, 2018, 2023, [15, 3.1,0,1])
+    prepare_model_RF_and_GB(police_data, weather_data, holidays_data, weekends_data, 2018, 2023, [6,0,15, 3.1, 0,1, 0])
+    
+    

@@ -37,11 +37,9 @@ python -m project
 - F - force downloading data
 - S - show statistics
 - V - show visualizations
-- 12 - 3.5 0 0
-    - Avg temperature
-    - Precipitations
-    - Weekend (0-No,1-Yes)
-    - Holiday (0-No,1-Yes)
+### Data to predict
+
+Data to predict can be found in project/setup.py file
 
 ## Sources
 

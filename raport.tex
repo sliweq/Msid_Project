@@ -190,7 +190,7 @@ Czy rodzaj opadów wpływa na ilość wypadków? Takie pytanie pytanie może nas
     \includegraphics[scale=0.3]{visualization/rain_vs_snow.png}
     \captionsetup{hypcap=false}
     \captionof{figure}{Wypadki podczas pogody, deszczu, śniegu}
-    \label{fig:normal_vs_rainy}
+    \label{fig:normal_vs_rainy_snow}
 \end{center}
 Jak widać opady śnegu mocno odbiegają od opadów deszczu. Średnia ilość wypadków jest prawie taka sama jak w dni pogodne. 
 
@@ -209,8 +209,7 @@ Support Vector Regression (SVR) jest rodzajem Support Vector Machine (SVM).
 Ponieważ SVR jest algorytmem opartym na odległości, skalowanie jest ważnym etapem przetwarzania wstępnego, który może poprawić dokładność i stabilność modelu.
 Dane które przyjmuje SVR powinny być wstępnie przetworzone, przeskalowane, ponieważ model bazuje na odległości. Do skalowania użyty zostały StandardScaler. Moduł ten  skaluje dane tak, aby ich średnia wynosiła 0, a odchylenie standardowe wynosiło 1.
 
-
-SVR oryginalnie został stworzony jako single-output, chcąc przewidzieć ilość wypadów, rannych i śmierci można użyć \textit{MultiOutputRegressor}, który działa jak wrapper na SVR i rozszerza do multi-output. 
+SVR oryginalnie został stworzony jako single-output. Aby "przerobić" SVR na multioutput można było użyć narzędzi dostępnych w Sklearn: \textit{MultiOutputRegressor} lub \textit{RegressionChain}.
 
  \begin{center}
     \includegraphics[scale=0.4]{images/multioutput-regression-02.png}
@@ -218,10 +217,19 @@ SVR oryginalnie został stworzony jako single-output, chcąc przewidzieć iloś�
     \captionof{figure}{\href{https://www.geeksforgeeks.org/multioutput-regression-in-machine-learning/}{www.geeksforgeeks.org}}
     \label{fig:multioutput}
 \end{center}
+\begin{center}
+    \includegraphics[scale=0.4]{images/chain.png}
+    \captionsetup{hypcap=false}
+    \captionof{figure}{\href{https://www.geeksforgeeks.org/multioutput-regression-in-machine-learning/}{www.geeksforgeeks.org}}
+    \label{fig:chain}
+\end{center}
 
-Wyszukując najlepsze parametry zdałem się na GridSearchCV. Testując parametry na modelach zwrócił wartości najlepsze parametry: kernel=rbf, gamma=10, C=4.
-Scoring jaki został użyty w GridSearchCV to \textit{mean absolute error}
+W projekcie nie została użyta żadna z powyższych metod. W przypadku MultiOutputRegressorów ciężko było o metrykę oceniającą każde wyjście z osobna. Natomiast w prypadku ChainRegression score \(R^2\) wychodził poniżej 0.1. 
+Można powiedzieć, że w projekcie została zastosowana metoda \ref{fig:multioutput}. Tworząc 3 osobne modele dla ilości wypadków, rannych czy śmierci. Idea jest ta sama jednak takie rozwiązanie pozwoliło mi oceniać każde z wyjść z osobna.
 
+Ogólny wynik modelu jest dosyć słaby. Score \(R^2\) dla liczby wypadków wskazywał ~0.34, dla poszkodowanych ~0.31, natomiast dla liczby śmierci ~0.06. Po wielu testach jakim był poddawany SVR można z całą pewnością dojść do wniosku, że liczba śmierci na drogach jest praktycznie do nie przewidzenia. Liczba wypadków w niektórych przpadkach przewidywana jest niemal dokładnie, jednak model w większości zaniżał dane.
+
+Parametry dla których SVR dział najlepiej to: kernel="rbf", C=4, gamma=0.1
 
 \subsection{Random Forest Regression}
 Random Forest to metoda uczenia się zespołowego, która łączy predykcje z wielu drzew decyzyjnych w celu uzyskania dokładniejszych i stabilnych wyników. Random Forest używa się zarówno do Regresji jak i Klasyfikacji.
@@ -238,13 +246,20 @@ Dla klażdego subsetu wybiera sie również podzbiór niepowtarzalnych cech. Ka�
     \label{fig:bagging}
 \end{center}
 
+Random Forest w przeciwieństwie do SVR nie potrzebuje Feature Scaling. Model ten oferuje wsparcie w  MultiOutput. Jednak potencjał ten nie został wykorzystany.
 
+Cechy na którcyh Random Forest działał najlepiej to: średnia temperatura, opady deszczu, opady śniegu, czy weekend, czy święto, miesiąc, dzień tygodnia.
 
+Początkowe testy (bez miesiąca i dnia tygodnia) z MultiOutput'em wypadały praktycznie nieralnie. Przewidywania praktycznie nie działały. 
+Rozwiązaniem okazało się rozdzielenie na 3 osobne modele przewidujące wypadki, poszkodowanych, śmierci oraz dodanie miesiąca i dnia tygodnia w którym doszło do wypadku. 
+Score \(R^2\) dla ilość wypadków oscylował w okolichach ~0.44. Wynik podobnie jak w prypadku SVR dla poszkodowanych jest nieco niższy ~0.38. 
+Natomiast dla śmierci wynik oscylował w okolicach 0.1. 
 
-Random Forest w przeciwieństwie do SVR nie potrzebuje Feature Scaling. Również MultiOutputRegressor nie jest tutaj potrzebny, ponieważ Random Forest wspiera multioutput. 
+Parametry dla których Rndo Forest Regressor dział najlepiej to: max depth=5, n estimators=100
+
 
 \section{Zakończenie}
 
-Jak widac 
+Z przeprowadzonych testów można wywnioskować, że jest możliwa predykcja ilości wypadków samochodowych w Polsce. Żeby uzyskać lepsze rezuultaty należy jeszcze bardziej uszczegółowić dane lub zebrać ich większą ilość. Modele radzą sobie również z predykcją osób poszkodowanych. 
 
 \end{document}
