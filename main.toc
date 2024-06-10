@@ -1,0 +1,13 @@
+\contentsline {section}{\numberline {1}Wstęp}{1}{section.1}%
+\contentsline {section}{\numberline {2}Dane użyte w programie}{1}{section.2}%
+\contentsline {section}{\numberline {3}Analiza danych}{1}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Wypadki drogowe}{1}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Liczba wypadków}{1}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Liczba poszkodowanych oraz zgonów}{4}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}Pogoda}{5}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Temperatura powietrza}{5}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}Opady atmosferyczne}{6}{subsubsection.3.2.2}%
+\contentsline {section}{\numberline {4}Predykcja wypadków, użyte modele}{8}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Support Vector Regression}{8}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Random Forest Regression}{9}{subsection.4.2}%
+\contentsline {section}{\numberline {5}Podsumowanie}{10}{section.5}%

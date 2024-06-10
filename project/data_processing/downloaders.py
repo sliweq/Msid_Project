@@ -22,7 +22,6 @@ from project.data_processing.save_data import (save_holidays_data_to_file,
                                                save_weekends_data_to_file)
 from project.setup_logging import setup_logging
 
-
 logger = logging.getLogger()
 setup_logging()
 
@@ -63,6 +62,9 @@ def download_police_data(start_year: int, end_year: int) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The downloaded data.
     """
+    logger.info(
+        "Attention, this download method is very slow and probably will take forever!"
+    )
     if start_year > end_year:
         start_year, end_year = end_year, start_year
 
