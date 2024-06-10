@@ -1,4 +1,4 @@
-# avg temp, precip sum, weekend, holiday
-PREDICT_SVR = [15, 3.1, 0, 1, 220]
-# month, weekday, avg temp, precip sum, weekend, holiday
-PREDICT_RFR_GBR = [6, 0, 15, 3.1, 0, 1, 220]
+# avg temp, precip sum, weekend, holiday, last 3 days accidents
+PREDICT_SVR = [15, 4.1, 1, 0, 320]
+# month, weekday, avg temp, precip sum, weekend, holiday, last 3 days accidents
+PREDICT_RFR = [6, 0, 15, 4.1, 0, 1, 0, 320]

@@ -67,15 +67,15 @@ def prepare_model_svr(
     )
     police = police.dropna()
     shifted_accidents = police["Wypadki drogowe"].shift(1)
-    police["last_3_days"] = shifted_accidents.rolling(window=4, min_periods=1).sum()
+    police["last_3_days"] = shifted_accidents.rolling(window=3, min_periods=1).sum()
     police.iloc[0, police.columns.get_loc("last_3_days")] = get_random_sum(
-        police["Wypadki drogowe"], 4
-    )
-    police.iloc[1, police.columns.get_loc("last_3_days")] += get_random_sum(
         police["Wypadki drogowe"], 3
     )
-    police.iloc[2, police.columns.get_loc("last_3_days")] += get_random_sum(
+    police.iloc[1, police.columns.get_loc("last_3_days")] += get_random_sum(
         police["Wypadki drogowe"], 2
+    )
+    police.iloc[2, police.columns.get_loc("last_3_days")] += get_random_sum(
+        police["Wypadki drogowe"], 1
     )
 
     y = police[["Wypadki drogowe"]]
@@ -185,7 +185,7 @@ def run_rfr(
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=42
     )
-    rfr = RandomForestRegressor(max_depth=5, n_estimators=100)
+    rfr = RandomForestRegressor(max_depth=7, n_estimators=100)
     # rfr = find_best_parameters(RandomForestRegressor(), {"n_estimators": [10, 100, 1000], "max_depth": [3,5,7]}, X_train, y_train)
     rfr.fit(X_train, np.ravel(y_train))
 

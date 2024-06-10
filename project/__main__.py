@@ -1,10 +1,10 @@
 import logging
-import sys
 from argparse import ArgumentParser, BooleanOptionalAction, Namespace
 
 from project.data_processing.dataframes import read_csv_file
 from project.data_processing.downloaders import download_data
 from project.data_processing.models import prepare_model_rfr, prepare_model_svr
+from project.setup import PREDICT_RFR, PREDICT_SVR
 from project.setup_logging import setup_logging
 from project.visualization.stats import print_stats
 from project.visualization.visualization import visualize_data
@@ -29,13 +29,6 @@ def parse_args() -> Namespace:
         default=False,
         help="Print statsistics",
     )
-    parser.add_argument(
-        "-F",
-        "--force",
-        action=BooleanOptionalAction,
-        default=False,
-        help="Force download data",
-    )
     return parser.parse_args()
 
 
@@ -44,9 +37,7 @@ if __name__ == "__main__":
     args = parse_args()
     setup_logging()
 
-    if args.force:
-        download_data(2018, 2023)
-        sys.exit(0)
+    download_data(2018, 2023)
 
     police_data = read_csv_file("police_data.csv")
     weather_data = read_csv_file("weather_data.csv")
@@ -65,7 +56,7 @@ if __name__ == "__main__":
         weekends_data,
         2018,
         2023,
-        [15, 3.1, 0, 1, 430],
+        PREDICT_SVR,
     )
     prepare_model_rfr(
         police_data,
@@ -74,5 +65,5 @@ if __name__ == "__main__":
         weekends_data,
         2018,
         2023,
-        [6, 0, 15, 4.1, 0, 1, 0, 430],
+        PREDICT_RFR,
     )

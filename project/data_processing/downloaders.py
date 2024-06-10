@@ -1,4 +1,5 @@
 import logging
+import os
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime
@@ -21,9 +22,9 @@ from project.data_processing.save_data import (save_holidays_data_to_file,
                                                save_weekends_data_to_file)
 from project.setup_logging import setup_logging
 
-if __name__ == "__main__":
-    logger = logging.getLogger()
-    setup_logging()
+
+logger = logging.getLogger()
+setup_logging()
 
 
 def download_data(start_year: int, end_year: int) -> None:
@@ -40,13 +41,15 @@ def download_data(start_year: int, end_year: int) -> None:
     if start_year > end_year:
         start_year, end_year = end_year, start_year
 
-    save_police_data_to_file(download_police_data(start_year, end_year))
+    if not os.path.exists(os.path.join("project", "data", "police_data.csv")):
+        save_police_data_to_file(download_police_data(start_year, end_year))
 
-    save_weather_data_to_file(download_weather_data(start_year, end_year))
-
-    save_holidays_data_to_file(download_holidays_data(start_year, end_year))
-
-    save_weekends_data_to_file(create_weekends_dataframe(start_year, end_year))
+    if not os.path.exists(os.path.join("project", "data", "weather_data.csv")):
+        save_weather_data_to_file(download_weather_data(start_year, end_year))
+    if not os.path.exists(os.path.join("project", "data", "holidays_data.csv")):
+        save_holidays_data_to_file(download_holidays_data(start_year, end_year))
+    if not os.path.exists(os.path.join("project", "data", "weekends_data.csv")):
+        save_weekends_data_to_file(create_weekends_dataframe(start_year, end_year))
 
 
 def download_police_data(start_year: int, end_year: int) -> pd.DataFrame:

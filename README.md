@@ -34,9 +34,9 @@ python -m project
 ```
 ### Run with args
 
-- F - force downloading data
 - S - show statistics
 - V - show visualizations
+
 ### Data to predict
 
 Data to predict can be found in project/setup.py file
